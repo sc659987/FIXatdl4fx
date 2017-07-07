@@ -1,0 +1,94 @@
+<Strategies xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation"
+            xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+            xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            imageLocation="/images/banner.gif"
+            strategyIdentifierTag="847"
+            versionIdentifierTag="9682">
+
+
+    <Strategy name="TakeProfit" uiRep="Take Profit" wireValue="1001" providerID="BAML" version="BAML v9.7.6.3">
+        <Description>&lt;html&gt;&lt;div style=&quot;width:355px;&quot;&gt;Executes at a specific price or better when
+            market price reaches it.
+        </Description>
+
+        <Parameter name="LimitPrice" xsi:type="Price_t" fixTag="44" use="required"/>
+
+        <Parameter name="_StartType" xsi:type="Char_t" fixTag="10002" use="optional">
+            <EnumPair enumID="Now" wireValue="0"/>
+            <EnumPair enumID="Date" wireValue="1"/>
+        </Parameter>
+        <Parameter name="EffectiveTime" xsi:type="UTCTimestamp_t" fixTag="168" use="optional"/>
+
+        <Parameter name="TimeInForce" xsi:type="Char_t" fixTag="59" use="required">
+            <EnumPair enumID="Day" wireValue="0"/>
+            <EnumPair enumID="GTD" wireValue="6"/>
+        </Parameter>
+
+        <Parameter name="ExpireTime" xsi:type="UTCTimestamp_t" fixTag="126" use="optional">
+            <Description>End order at selected time</Description>
+        </Parameter>
+
+        <Parameter name="OrdType" xsi:type="Char_t" fixTag="40" constValue="2"/>
+
+        <lay:StrategyLayout>
+            <lay:StrategyPanel collapsible="false" orientation="VERTICAL">
+
+                <lay:StrategyPanel collapsible="false" orientation="VERTICAL">
+                    <lay:Control ID="c_LimitPrice" xsi:type="lay:TextField_t" label="Limit Price"
+                                 parameterRef="LimitPrice"
+                                 tooltip="Will trade up to, but not beyond, your limit price"/>
+                </lay:StrategyPanel>
+
+                <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="Start">
+                    <lay:Control ID="c_StartType" xsi:type="lay:RadioButtonList_t" parameterRef="_StartType"
+                                 initValue="Now" orientation="VERTICAL">
+                        <lay:ListItem uiRep="Now" enumID="Now"/>
+                        <lay:ListItem uiRep="Date" enumID="Date"/>
+                    </lay:Control>
+
+                    <lay:Control ID="c_EffectiveTime" xsi:type="lay:Clock_t" label="" parameterRef="EffectiveTime">
+                        <flow:StateRule enabled="false" value="{NULL}">
+                            <val:Edit field="c_StartType" operator="NE" value="Date"/>
+                        </flow:StateRule>
+                    </lay:Control>
+                </lay:StrategyPanel>
+
+                <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="End">
+                    <lay:Control ID="c_TimeInForce" xsi:type="lay:RadioButtonList_t" parameterRef="TimeInForce"
+                                 initValue="Day" orientation="VERTICAL">
+                        <lay:ListItem uiRep="Day" enumID="Day"/>
+                        <lay:ListItem uiRep="Good Until" enumID="GTD"/>
+                    </lay:Control>
+
+                    <lay:Control ID="c_ExpireTime" xsi:type="lay:Clock_t" label="" parameterRef="ExpireTime">
+                        <flow:StateRule enabled="false" value="{NULL}">
+                            <val:Edit field="c_TimeInForce" operator="NE" value="GTD"/>
+                        </flow:StateRule>
+                    </lay:Control>
+
+                    <lay:Control ID="c_MultidayNotSupported" xsi:type="lay:Label_t"
+                                 initValue="* Multi-day orders are not supported.">
+                        <flow:StateRule visible="false">
+                            <val:Edit field="c_TimeInForce" operator="EQ" value="Day"/>
+                        </flow:StateRule>
+                    </lay:Control>
+                </lay:StrategyPanel>
+
+            </lay:StrategyPanel>
+        </lay:StrategyLayout>
+
+        <!--  validation rules -->
+        <val:StrategyEdit errorMessage="Start time must be less than end time.">
+            <val:Edit logicOperator="OR">
+                <val:Edit field="ExpireTime" operator="NX"/>
+                <val:Edit field="EffectiveTime" operator="NX"/>
+                <val:Edit field="ExpireTime" operator="GT" field2="EffectiveTime"/>
+            </val:Edit>
+        </val:StrategyEdit>
+    </Strategy>
+</Strategies>
+
+

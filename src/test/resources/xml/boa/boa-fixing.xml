@@ -1,0 +1,383 @@
+<Strategies xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+            xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation"
+            xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            imageLocation="/images/banner.gif"
+            strategyIdentifierTag="847"
+            versionIdentifierTag="9682">
+
+
+    <Strategy name="Fixing" enumID="Fixing" uiRep="Fixing" wireValue="1011" providerID="BAML" version="BAML v9.7.6.3">
+        <Description>&lt;html&gt;&lt;div style=&quot;width:350px;&quot;&gt;Executes at the published fixing price for the selected fixing source, fixing time and date.</Description>
+        
+        <Parameter name="FixingSource" xsi:type="String_t" fixTag="9029" use="required" mutableOnCxlRpl="false">
+            <EnumPair enumID="WMR" wireValue="WMR"/>
+            <EnumPair enumID="BFIX" wireValue="BFIX"/>
+            <EnumPair enumID="BOC" wireValue="BOC"/>
+            <EnumPair enumID="TKFE" wireValue="TKFE"/>
+            <EnumPair enumID="CNHFIX" wireValue="CNHFIX"/>
+        </Parameter>
+
+        <Parameter name="FixingDate" xsi:type="UTCDateOnly_t" fixTag="9030" use="required"/>
+
+        <Parameter name="_FixingTime_Time" xsi:type="String_t" fixTag="10003" use="optional" mutableOnCxlRpl="false">
+            <EnumPair enumID="00:00" wireValue="00:00"/>
+            <EnumPair enumID="00:30" wireValue="00:30"/>
+            <EnumPair enumID="01:00" wireValue="01:00"/>
+            <EnumPair enumID="01:30" wireValue="01:30"/>
+            <EnumPair enumID="02:00" wireValue="02:00"/>
+            <EnumPair enumID="02:30" wireValue="02:30"/>
+            <EnumPair enumID="03:00" wireValue="03:00"/>
+            <EnumPair enumID="03:30" wireValue="03:30"/>
+            <EnumPair enumID="04:00" wireValue="04:00"/>
+            <EnumPair enumID="04:30" wireValue="04:30"/>
+            <EnumPair enumID="05:00" wireValue="05:00"/>
+            <EnumPair enumID="05:30" wireValue="05:30"/>
+            <EnumPair enumID="06:00" wireValue="06:00"/>
+            <EnumPair enumID="06:30" wireValue="06:30"/>
+            <EnumPair enumID="07:00" wireValue="07:00"/>
+            <EnumPair enumID="07:30" wireValue="07:30"/>
+            <EnumPair enumID="08:00" wireValue="08:00"/>
+            <EnumPair enumID="08:30" wireValue="08:30"/>
+            <EnumPair enumID="09:00" wireValue="09:00"/>
+            <EnumPair enumID="09:30" wireValue="09:30"/>
+            <EnumPair enumID="09:55" wireValue="09:55"/>
+            <EnumPair enumID="10:00" wireValue="10:00"/>
+            <EnumPair enumID="10:30" wireValue="10:30"/>
+            <EnumPair enumID="11:00" wireValue="11:00"/>
+            <EnumPair enumID="11:30" wireValue="11:30"/>
+            <EnumPair enumID="12:00" wireValue="12:00"/>
+            <EnumPair enumID="12:30" wireValue="12:30"/>
+            <EnumPair enumID="13:00" wireValue="13:00"/>
+            <EnumPair enumID="13:15" wireValue="13:15"/>
+            <EnumPair enumID="13:30" wireValue="13:30"/>
+            <EnumPair enumID="14:00" wireValue="14:00"/>
+            <EnumPair enumID="14:30" wireValue="14:30"/>
+            <EnumPair enumID="15:00" wireValue="15:00"/>
+            <EnumPair enumID="15:30" wireValue="15:30"/>
+            <EnumPair enumID="16:00" wireValue="16:00"/>
+            <EnumPair enumID="16:30" wireValue="16:30"/>
+            <EnumPair enumID="17:00" wireValue="17:00"/>
+            <EnumPair enumID="17:30" wireValue="17:30"/>
+            <EnumPair enumID="18:00" wireValue="18:00"/>
+            <EnumPair enumID="18:30" wireValue="18:30"/>
+            <EnumPair enumID="19:00" wireValue="19:00"/>
+            <EnumPair enumID="19:30" wireValue="19:30"/>
+            <EnumPair enumID="20:00" wireValue="20:00"/>
+            <EnumPair enumID="20:30" wireValue="20:30"/>
+            <EnumPair enumID="21:00" wireValue="21:00"/>
+            <EnumPair enumID="21:30" wireValue="21:30"/>
+            <EnumPair enumID="22:00" wireValue="22:00"/>
+            <EnumPair enumID="22:30" wireValue="22:30"/>
+            <EnumPair enumID="23:00" wireValue="23:00"/>
+            <EnumPair enumID="23:30" wireValue="23:30"/>
+        </Parameter>
+        <Parameter name="_FixingTime_TimeZone" xsi:type="String_t" fixTag="10004" use="optional"
+                   mutableOnCxlRpl="false">
+            <EnumPair enumID="LON" wireValue="LON"/>
+            <EnumPair enumID="NYK" wireValue="NYK"/>
+            <EnumPair enumID="TKY" wireValue="TKY"/>
+            <EnumPair enumID="HKG" wireValue="HKG"/>
+        </Parameter>
+
+        <lay:StrategyLayout>
+            <lay:StrategyPanel collapsible="false" orientation="VERTICAL">
+
+                <lay:StrategyPanel title="Strategy Parameters" collapsible="false" orientation="VERTICAL">
+
+                    <lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+                        <lay:Control ID="c_FixingSrcLabel" xsi:type="lay:Label_t" initValue="Fixing Src*   "/>
+
+                        <lay:Control ID="c_FixingSource" xsi:type="lay:DropDownList_t" initValue="WMR"
+                                     parameterRef="FixingSource">
+                            <lay:ListItem enumID="WMR" uiRep="WMR"/>
+                            <lay:ListItem enumID="BFIX" uiRep="BFIX"/>
+                            <lay:ListItem enumID="BOC" uiRep="BOC"/>
+                            <lay:ListItem enumID="TKFE" uiRep="TKFE"/>
+                            <lay:ListItem enumID="CNHFIX" uiRep="CNHFIX"/>
+                        </lay:Control>
+
+                        <lay:Control ID="c_FixingTime_Time" xsi:type="lay:DropDownList_t" initValue="00:00"
+                                     parameterRef="_FixingTime_Time">
+                            <lay:ListItem enumID="00:00" uiRep="00:00"/>
+                            <lay:ListItem enumID="00:30" uiRep="00:30"/>
+                            <lay:ListItem enumID="01:00" uiRep="01:00"/>
+                            <lay:ListItem enumID="01:30" uiRep="01:30"/>
+                            <lay:ListItem enumID="02:00" uiRep="02:00"/>
+                            <lay:ListItem enumID="02:30" uiRep="02:30"/>
+                            <lay:ListItem enumID="03:00" uiRep="03:00"/>
+                            <lay:ListItem enumID="03:30" uiRep="03:30"/>
+                            <lay:ListItem enumID="04:00" uiRep="04:00"/>
+                            <lay:ListItem enumID="04:30" uiRep="04:30"/>
+                            <lay:ListItem enumID="05:00" uiRep="05:00"/>
+                            <lay:ListItem enumID="05:30" uiRep="05:30"/>
+                            <lay:ListItem enumID="06:00" uiRep="06:00"/>
+                            <lay:ListItem enumID="06:30" uiRep="06:30"/>
+                            <lay:ListItem enumID="07:00" uiRep="07:00"/>
+                            <lay:ListItem enumID="07:30" uiRep="07:30"/>
+                            <lay:ListItem enumID="08:00" uiRep="08:00"/>
+                            <lay:ListItem enumID="08:30" uiRep="08:30"/>
+                            <lay:ListItem enumID="09:00" uiRep="09:00"/>
+                            <lay:ListItem enumID="09:30" uiRep="09:30"/>
+                            <lay:ListItem enumID="09:55" uiRep="09:55"/>
+                            <lay:ListItem enumID="10:00" uiRep="10:00"/>
+                            <lay:ListItem enumID="10:30" uiRep="10:30"/>
+                            <lay:ListItem enumID="11:00" uiRep="11:00"/>
+                            <lay:ListItem enumID="11:30" uiRep="11:30"/>
+                            <lay:ListItem enumID="12:00" uiRep="12:00"/>
+                            <lay:ListItem enumID="12:30" uiRep="12:30"/>
+                            <lay:ListItem enumID="13:00" uiRep="13:00"/>
+                            <lay:ListItem enumID="13:15" uiRep="13:15"/>
+                            <lay:ListItem enumID="13:30" uiRep="13:30"/>
+                            <lay:ListItem enumID="14:00" uiRep="14:00"/>
+                            <lay:ListItem enumID="14:30" uiRep="14:30"/>
+                            <lay:ListItem enumID="15:00" uiRep="15:00"/>
+                            <lay:ListItem enumID="15:30" uiRep="15:30"/>
+                            <lay:ListItem enumID="16:00" uiRep="16:00"/>
+                            <lay:ListItem enumID="16:30" uiRep="16:30"/>
+                            <lay:ListItem enumID="17:00" uiRep="17:00"/>
+                            <lay:ListItem enumID="17:30" uiRep="17:30"/>
+                            <lay:ListItem enumID="18:00" uiRep="18:00"/>
+                            <lay:ListItem enumID="18:30" uiRep="18:30"/>
+                            <lay:ListItem enumID="19:00" uiRep="19:00"/>
+                            <lay:ListItem enumID="19:30" uiRep="19:30"/>
+                            <lay:ListItem enumID="20:00" uiRep="20:00"/>
+                            <lay:ListItem enumID="20:30" uiRep="20:30"/>
+                            <lay:ListItem enumID="21:00" uiRep="21:00"/>
+                            <lay:ListItem enumID="21:30" uiRep="21:30"/>
+                            <lay:ListItem enumID="22:00" uiRep="22:00"/>
+                            <lay:ListItem enumID="22:30" uiRep="22:30"/>
+                            <lay:ListItem enumID="23:00" uiRep="23:00"/>
+                            <lay:ListItem enumID="23:30" uiRep="23:30"/>
+
+                            <flow:StateRule value="16:00" lazy="true">
+                                <val:Edit logicOperator="OR">
+                                    <val:Edit field="c_FixingSource" operator="EQ" value="WMR"/>
+                                    <val:Edit field="c_FixingSource" operator="EQ" value="BFIX"/>
+                                </val:Edit>
+                            </flow:StateRule>
+
+                            <flow:StateRule value="12:00" lazy="true">
+                                <val:Edit field="c_FixingSource" operator="EQ" value="BOC"/>
+                            </flow:StateRule>
+
+                            <flow:StateRule value="09:00" lazy="true">
+                                <val:Edit field="c_FixingSource" operator="EQ" value="TKFE"/>
+                            </flow:StateRule>
+
+                            <flow:StateRule value="11:00">
+                                <val:Edit field="c_FixingSource" operator="EQ" value="CNHFIX"/>
+                            </flow:StateRule>
+
+                        </lay:Control>
+
+                        <lay:Control ID="c_FixingTime_TimeZone" xsi:type="lay:DropDownList_t" initValue="LON"
+                                     parameterRef="_FixingTime_TimeZone">
+                            <lay:ListItem enumID="LON" uiRep="LON"/>
+                            <lay:ListItem enumID="NYK" uiRep="NYK"/>
+                            <lay:ListItem enumID="TKY" uiRep="TKY"/>
+                            <lay:ListItem enumID="HKG" uiRep="HKG"/>
+
+                            <flow:StateRule value="LON" lazy="true">
+                                <val:Edit logicOperator="OR">
+                                    <val:Edit field="c_FixingSource" operator="EQ" value="WMR"/>
+                                    <val:Edit field="c_FixingSource" operator="EQ" value="BFIX"/>
+                                </val:Edit>
+                            </flow:StateRule>
+
+                            <flow:StateRule value="NYK" lazy="true">
+                                <val:Edit field="c_FixingSource" operator="EQ" value="BOC"/>
+                            </flow:StateRule>
+
+                            <flow:StateRule value="TKY" lazy="true">
+                                <val:Edit logicOperator="OR">
+                                    <val:Edit field="c_FixingSource" operator="EQ" value="TKFE"/>
+                                </val:Edit>
+                            </flow:StateRule>
+
+                            <flow:StateRule value="HKG" lazy="true">
+                                <val:Edit field="c_FixingSource" operator="EQ" value="CNHFIX"/>
+                            </flow:StateRule>
+
+                        </lay:Control>
+
+                    </lay:StrategyPanel>
+
+                    <lay:StrategyPanel collapsible="false" orientation="VERTICAL">
+                        <lay:Control ID="c_FixingDate" xsi:type="lay:Clock_t" label="Fixing Date"
+                                     parameterRef="FixingDate"/>
+                    </lay:StrategyPanel>
+
+
+                    <lay:StrategyPanel collapsible="false" orientation="VERTICAL">
+                        <lay:Control ID="c_WMR_Label" xsi:type="lay:Label_t"
+                                     initValue="WMR should be LON and every 1 hour">
+                            <flow:StateRule visible="false">
+                                <val:Edit field="c_FixingSource" operator="NE" value="WMR"/>
+                            </flow:StateRule>
+                        </lay:Control>
+                        <lay:Control ID="c_BFIX_Label" xsi:type="lay:Label_t"
+                                     initValue="BFIX should be LON and every 30 minutes">
+                            <flow:StateRule visible="false">
+                                <val:Edit field="c_FixingSource" operator="NE" value="BFIX"/>
+                            </flow:StateRule>
+                        </lay:Control>
+                        <lay:Control ID="c_BOC_Label" xsi:type="lay:Label_t" initValue="BOC should be 12:00 NYK">
+                            <flow:StateRule visible="false">
+                                <val:Edit field="c_FixingSource" operator="NE" value="BOC"/>
+                            </flow:StateRule>
+                        </lay:Control>
+                        <lay:Control ID="c_TKFE_Label" xsi:type="lay:Label_t"
+                                     initValue="TKFE should be TKY and every 1 hour from 9:00 to 17:00">
+                            <flow:StateRule visible="false">
+                                <val:Edit field="c_FixingSource" operator="NE" value="TKFE"/>
+                            </flow:StateRule>
+                        </lay:Control>
+                        <lay:Control ID="c_CNHFIX_Label" xsi:type="lay:Label_t" initValue="CNHFIX should be 11:00 HKG">
+                            <flow:StateRule visible="false">
+                                <val:Edit field="c_FixingSource" operator="NE" value="CNHFIX"/>
+                            </flow:StateRule>
+                        </lay:Control>
+                    </lay:StrategyPanel>
+
+                </lay:StrategyPanel>
+            </lay:StrategyPanel>
+        </lay:StrategyLayout>
+
+        <val:StrategyEdit errorMessage="WMR should be LON and every 1 hour">
+            <val:Edit logicOperator="OR">
+                <val:Edit field="FixingSource" operator="NE" value="WMR"/>
+                <val:Edit logicOperator="AND">
+                    <val:Edit field="_FixingTime_TimeZone" operator="EQ" value="LON"/>
+                    <val:Edit logicOperator="OR">
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="00:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="01:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="02:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="03:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="04:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="05:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="06:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="07:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="08:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="09:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="10:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="11:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="12:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="13:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="14:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="15:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="16:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="17:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="18:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="19:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="20:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="21:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="22:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="23:00"/>
+                    </val:Edit>
+                </val:Edit>
+            </val:Edit>
+        </val:StrategyEdit>
+
+        <val:StrategyEdit errorMessage="BFIX should be LON and every 30 minutes">
+            <val:Edit logicOperator="OR">
+                <val:Edit field="FixingSource" operator="NE" value="BFIX"/>
+                <val:Edit logicOperator="AND">
+                    <val:Edit field="_FixingTime_TimeZone" operator="EQ" value="LON"/>
+                    <val:Edit logicOperator="OR">
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="00:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="00:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="01:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="01:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="02:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="02:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="03:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="03:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="04:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="04:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="05:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="05:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="06:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="06:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="07:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="07:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="08:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="08:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="09:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="09:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="10:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="10:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="11:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="11:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="12:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="12:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="13:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="13:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="14:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="14:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="15:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="15:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="16:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="16:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="17:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="17:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="18:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="18:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="19:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="19:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="20:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="20:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="21:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="21:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="22:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="22:30"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="23:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="23:30"/>
+                    </val:Edit>
+                </val:Edit>
+            </val:Edit>
+        </val:StrategyEdit>
+
+        <val:StrategyEdit errorMessage="BOC should be 12:00 NYK">
+            <val:Edit logicOperator="OR">
+                <val:Edit field="FixingSource" operator="NE" value="BOC"/>
+                <val:Edit logicOperator="AND">
+                    <val:Edit field="_FixingTime_TimeZone" operator="EQ" value="NYK"/>
+                    <val:Edit field="_FixingTime_Time" operator="EQ" value="12:00"/>
+                </val:Edit>
+            </val:Edit>
+        </val:StrategyEdit>
+
+        <val:StrategyEdit errorMessage="TKFE should be TKY and every 1 hour from 9:00 to 17:00">
+            <val:Edit logicOperator="OR">
+                <val:Edit field="FixingSource" operator="NE" value="TKFE"/>
+                <val:Edit logicOperator="AND">
+                    <val:Edit field="_FixingTime_TimeZone" operator="EQ" value="TKY"/>
+                    <val:Edit logicOperator="OR">
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="09:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="10:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="11:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="12:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="13:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="14:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="15:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="16:00"/>
+                        <val:Edit field="_FixingTime_Time" operator="EQ" value="17:00"/>
+                    </val:Edit>
+                </val:Edit>
+            </val:Edit>
+        </val:StrategyEdit>
+
+        <val:StrategyEdit errorMessage="CNHFIX should be 11:00 HKG">
+            <val:Edit logicOperator="OR">
+                <val:Edit field="FixingSource" operator="NE" value="CNHFIX"/>
+                <val:Edit logicOperator="AND">
+                    <val:Edit field="_FixingTime_TimeZone" operator="EQ" value="HKG"/>
+                    <val:Edit field="_FixingTime_Time" operator="EQ" value="11:00"/>
+                </val:Edit>
+            </val:Edit>
+        </val:StrategyEdit>
+    </Strategy>
+</Strategies>

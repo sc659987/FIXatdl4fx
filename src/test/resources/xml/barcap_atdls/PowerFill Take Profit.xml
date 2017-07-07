@@ -1,0 +1,87 @@
+<!-- ********************** -->
+<!-- ***** TAKE PROFIT **** -->
+<!-- ********************** -->
+
+<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core" xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation" xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout" xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core" strategyIdentifierTag="847" versionIdentifierTag="958">
+
+	<Strategy name="PowerFillTakeProfit" uiRep="PowerFill Take Profit" wireValue="1001" providerID="">
+
+		<!-- Common parameters -->
+		<Parameter name="startTime" xsi:type="UTCTimestamp_t" use="optional" />
+		<Parameter name="endTime" xsi:type="UTCTimestamp_t" use="optional" />
+
+		<!-- Take profit parameters -->
+		<Parameter name="level" xsi:type="Price_t" use="required" />
+		<Parameter name="iceberg" xsi:type="Amt_t" use="optional" />
+
+		<lay:StrategyLayout>
+
+			<lay:StrategyPanel title="Strategy Parameters" collapsible="false" orientation="VERTICAL">
+
+				<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+					<lay:StrategyPanel title="Description" collapsible="false" orientation="VERTICAL">
+						<lay:Control ID="DescriptionL1" xsi:type="lay:Label_t" label="A regular limit order to buy at lower than the market price or to sell higher up." />
+						<lay:Control ID="DescriptionL2" xsi:type="lay:Label_t" label="These are the orders that are shown to other users of BARX and form part of the" />
+						<lay:Control ID="DescriptionL3" xsi:type="lay:Label_t" label="prices that they see. Orders can be left as close to the market as you wish and" />
+						<lay:Control ID="DescriptionL4" xsi:type="lay:Label_t" label="even within the bid/offer spread. If part of the order can be filled immediately it" />
+						<lay:Control ID="DescriptionL5" xsi:type="lay:Label_t" label="will be (and possibly at a better rate) and the balance will then be filled as usual." />
+					</lay:StrategyPanel>
+				</lay:StrategyPanel>
+
+				<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+					<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+
+						<lay:StrategyPanel title="Common Parameters" collapsible="false" orientation="VERTICAL">
+							<!-- Start time -->
+							<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" title="Start Time">
+								<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+									<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+										<lay:Control ID="c_NoStartTime" xsi:type="lay:RadioButton_t" label="Now" initValue="true" radioGroup="StartTimeRB" />
+									</lay:StrategyPanel>
+								</lay:StrategyPanel>
+								<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+									<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+										<lay:Control ID="c_EnableStartTime" xsi:type="lay:RadioButton_t" radioGroup="StartTimeRB" />
+									</lay:StrategyPanel>
+									<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+										<lay:Control ID="c_StartTime" xsi:type="lay:Clock_t" parameterRef="startTime">
+											<flow:StateRule enabled="false" value="{NULL}">
+												<val:Edit field="c_EnableStartTime" operator="EQ" value="false" />
+											</flow:StateRule>
+										</lay:Control>
+									</lay:StrategyPanel>
+								</lay:StrategyPanel>
+							</lay:StrategyPanel>
+
+							<!-- End time -->
+							<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" title="End Time">
+								<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+									<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+										<lay:Control ID="c_EndTime" xsi:type="lay:Clock_t" parameterRef="endTime" label="                  "  initValueMode="1" initValue="16:59:00" localMktTz="America/New_York"/>
+									</lay:StrategyPanel>
+								</lay:StrategyPanel>
+							</lay:StrategyPanel>
+						</lay:StrategyPanel>
+
+						<!-- Take profit Parameters -->
+						<lay:StrategyPanel title="Take profit Parameters" collapsible="false" orientation="VERTICAL">
+							<lay:Control ID="c_LevelField" xsi:type="lay:TextField_t" label="Price Level" parameterRef="level"
+								tooltip="&lt;html&gt;This level controls when orders are placed in the market.&lt;br/&gt;TWAP will only place orders in the market when the price is&lt;br/&gt;below this level if buying or above this level if selling.&lt;br/&gt;For example, use the &#x2018;Sell Above&#x2019; to put in a Limit Price,&lt;br/&gt;which will pause the sell order every time it goes below&lt;br/&gt;your specified limit price.&lt;/html&gt;" />
+							<lay:Control ID="c_IBField" xsi:type="lay:SingleSpinner_t" label="Iceberg" incrementPolicy="lotSize" increment="1" parameterRef="iceberg"
+								tooltip="&lt;html&gt;Orders can have an iceberg added. An Iceberg is the&lt;br/&gt;maximum amount of any order that we show to other&lt;br/&gt;clients for them to trade on. Your whole order retains&lt;br/&gt;its position in the order book and can be filled up to&lt;br/&gt;the full order size when someone trades against it -&lt;br/&gt;we just won't show we have an order in any bigger than&lt;br/&gt;the iceberg amount.&lt;/html&gt;" />
+						</lay:StrategyPanel>
+					</lay:StrategyPanel>
+				</lay:StrategyPanel>
+			</lay:StrategyPanel>
+		</lay:StrategyLayout>
+
+		<val:StrategyEdit errorMessage="Start Time must precede End Time.">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="startTime" operator="NX" />
+				<val:Edit field="endTime" operator="NX" />
+				<val:Edit field="startTime" operator="LT" field2="endTime" />
+			</val:Edit>
+		</val:StrategyEdit>
+	</Strategy>
+</Strategies>

@@ -1,0 +1,113 @@
+<!-- Version: $Revision: 1.15 $  -->
+<Strategies
+        xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+        xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation"
+        xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+        xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+        strategyIdentifierTag="9000"
+        >
+    <Strategy name="VWAP" uiRep="VWAP" wireValue="VWAP" version="1" fixMsgType="D" providerID="GS">
+		<Description>&lt;html&gt;Provide a volume-weighted average price&lt;br/&gt;(VWAP) over a specified time frame.&lt;/html&gt;</Description>
+
+
+        <!-- BEGIN 360t specific parameters used to save the state of checkboxes. Will not be sent to provider. -->
+		    <Parameter name="_360t_Duration1" xsi:type="Boolean_t" fixTag="100002" mutableOnCxlRpl="false"/>
+     		<Parameter name="_360t_Duration2" xsi:type="Boolean_t" fixTag="100003" mutableOnCxlRpl="false"/>
+     		<Parameter name="_360t_EnableStartTime" xsi:type="Boolean_t" fixTag="100006" mutableOnCxlRpl="true"/>
+        <!-- END 360t specific parameters -->
+
+        <Parameter name="AlgoStartTime" xsi:type="UTCTimestamp_t" fixTag="9001" use="optional" mutableOnCxlRpl="false">
+            <Description>Strategy Start Time</Description>
+        </Parameter>
+
+		    <Parameter name="AlgoDurationH" xsi:type="Int_t" fixTag="90231" use="optional" minValue="0" maxValue="23" mutableOnCxlRpl="false">
+			    <Description>Amount of time the algorithm will remain active - hours</Description>
+		    </Parameter>
+		    <Parameter name="AlgoDurationM" xsi:type="Int_t" fixTag="90232" use="optional" minValue="0" maxValue="59" mutableOnCxlRpl="false">
+			    <Description>Amount of time the algorithm will remain active - minutes</Description>
+		    </Parameter>
+		    <Parameter name="AlgoDurationS" xsi:type="Int_t" fixTag="90233" use="optional" minValue="0" maxValue="59" mutableOnCxlRpl="false">
+			    <Description>Amount of time the algorithm will remain active - seconds</Description>
+        </Parameter>
+
+        <Parameter name="AlgoEndTime" xsi:type="UTCTimestamp_t" fixTag="9004" use="optional">
+            <Description>Strategy End Time</Description>
+        </Parameter>
+
+        <Parameter name="TimeInForce" xsi:type="Char_t" fixTag="59" use="required" mutableOnCxlRpl="false">
+            <EnumPair enumID="Day" wireValue="0"/>
+        </Parameter>
+
+        <Parameter name="GoodUntilTime" xsi:type="UTCTimestamp_t" fixTag="126" use="optional" mutableOnCxlRpl="false">
+            <Description>End order at selected time</Description>
+        </Parameter>
+
+        <lay:StrategyLayout>
+
+            <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="">
+
+				<lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="Start Time (Default is NOW)">
+                    <lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+            				    <lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+                            <lay:Control tooltip="Start at the selected time" ID="EnableStartTime" xsi:type="lay:CheckBox_t" initValue="false" label="At:"  parameterRef="_360t_EnableStartTime"/>
+                        </lay:StrategyPanel>
+            				    <lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+                          <lay:Control ID="StartTimeClock" xsi:type="lay:Clock_t" label="" parameterRef="AlgoStartTime">
+                              <flow:StateRule enabled="false" value="{NULL}">
+                                  <val:Edit field="EnableStartTime" operator="EQ" value="false"/>
+                              </flow:StateRule>
+                          </lay:Control>
+                      </lay:StrategyPanel>
+                    </lay:StrategyPanel>
+                </lay:StrategyPanel>
+
+                <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="End Time">
+                    <lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+                        <lay:Control tooltip="Duration" ID="EnableDuration" xsi:type="lay:RadioButton_t" label="Duration" initValue="true" parameterRef="_360t_Duration1" radioGroup="EndTimeRB"/>
+							<lay:Control ID="Duration_H" xsi:type="lay:SingleSpinner_t" label="" parameterRef="AlgoDurationH" initValue="1">
+								<flow:StateRule enabled="false" value="{NULL}">
+									<val:Edit field="EnableDuration" operator="EQ" value="false" />
+								</flow:StateRule>
+							</lay:Control>
+							<lay:Control ID="Duration_M_L" xsi:type="lay:Label_t" initValue=":"/>
+							<lay:Control ID="Duration_M" xsi:type="lay:SingleSpinner_t" label="" parameterRef="AlgoDurationM" initValue="0">
+								<flow:StateRule enabled="false" value="{NULL}">
+									<val:Edit field="EnableDuration" operator="EQ" value="false" />
+								</flow:StateRule>
+							</lay:Control>
+							<lay:Control ID="Duration_S_L" xsi:type="lay:Label_t" initValue=":"/>
+							<lay:Control ID="Duration_S" xsi:type="lay:SingleSpinner_t" label="" parameterRef="AlgoDurationS" initValue="0">
+                            <flow:StateRule enabled="false" value="{NULL}">
+                                <val:Edit field="EnableDuration" operator="EQ" value="false"/>
+                            </flow:StateRule>
+                        </lay:Control>
+                    </lay:StrategyPanel>
+                    <lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+					    <lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+		                	<lay:Control tooltip="End at the selected time" ID="EnableEndTime" xsi:type="lay:RadioButton_t" label="At:" parameterRef="_360t_Duration2" radioGroup="EndTimeRB"/>
+						</lay:StrategyPanel>					
+						<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+		                    <lay:Control ID="EndTimeClock" xsi:type="lay:Clock_t" label="" parameterRef="AlgoEndTime">
+		                        <flow:StateRule enabled="false" value="{NULL}">
+		                            <val:Edit field="EnableEndTime" operator="EQ" value="false"/>
+		                        </flow:StateRule>
+		                    </lay:Control>
+                    	</lay:StrategyPanel>
+               		</lay:StrategyPanel>
+				</lay:StrategyPanel>
+
+                <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="Good Until">
+                    <lay:Control ID="GoodUntil" xsi:type="lay:RadioButtonList_t" parameterRef="TimeInForce" initValue="Day" orientation="VERTICAL">
+                        <lay:ListItem uiRep="Day" enumID="Day"/>
+                    </lay:Control>
+
+                </lay:StrategyPanel>
+
+            </lay:StrategyPanel>
+
+        </lay:StrategyLayout>
+
+    </Strategy>
+</Strategies>

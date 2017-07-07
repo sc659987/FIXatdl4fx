@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation"
+            xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+            xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" strategyIdentifierTag="847" tag957Support="true"
+            xsi:schemaLocation="http://www.w3.org/2001/XMLSchema-instance">
+
+    <Strategy name="Peg" wireValue="1007" fixMsgType="D">
+
+        <Description>&lt;html&gt;&lt;div style=&quot;width:350px;&quot;&gt;Allows trade entry with the advantage of
+            not paying the bid-ask spread.
+        </Description>
+
+        <Parameter xsi:type="Amt_t" minValue="1" name="Sweep Size" fixTag="960" use="required"/>
+        <Parameter xsi:type="Int_t" minValue="-10" maxValue="1000" name="Peg Value Ticks" fixTag="960"
+                   use="required"/>
+        <Parameter name="Duration In Minutes" xsi:type="Int_t" minValue="1" maxValue="1440" fixTag="960" use="optional"/>
+        <Parameter xsi:type="UTCTimestamp_t" use="optional" fixTag="960" name="EndTime" showDateControl="true"/>
+        <Parameter xsi:type="UTCTimestamp_t" use="optional" fixTag="960" name="StartTime" showDateControl="true"/>
+        <Parameter name="DefaultStartTime" xsi:type="UTCTimestamp_t" fixTag="960" use="optional"
+                   localMktTz="America/Toronto"/>
+        <lay:StrategyLayout>
+            <lay:StrategyPanel border="Line" orientation="VERTICAL" collapsed="false" title="Parameters">
+                <lay:StrategyPanel title="Parameters" collapsed="false" orientation="VERTICAL" border="Line">
+                    <lay:Control xsi:type="lay:TextField_t" ID="Sweep Size" parameterRef="Sweep Size" label="Sweep Size"/>
+                    <lay:Control xsi:type="lay:SingleSpinner_t" initValue="0.0" increment="1.0" ID=" Peg Value Ticks"
+                                 parameterRef="Peg Value Ticks" label="Peg Value (In Ticks)"/>
+
+                </lay:StrategyPanel>
+                <lay:StrategyPanel title="Start Time" orientation="VERTICAL" collapsible="false">
+                    <lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+                        <lay:Control ID="c_NoStartTime" xsi:type="lay:RadioButton_t" label="Now" initValue="true"
+                                     radioGroup="StartTimeRB" localMktTz="America/Toronto"/>
+                    </lay:StrategyPanel>
+                    <lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+                        <lay:Control ID="c_EnableStartTime" xsi:type="lay:RadioButton_t" label="Time"
+                                     parameterRef="DefaultStartTime" radioGroup="StartTimeRB"/>
+                        <lay:Control xsi:type="lay:Clock_t" ID="c_StartTimeClock" label="" parameterRef="StartTime"
+                                     localMktTz="America/Toronto">
+                            <flow:StateRule enabled="false" value="{NULL}">
+                                <val:Edit field="c_EnableStartTime" operator="EQ" value="false"/>
+                            </flow:StateRule>
+                        </lay:Control>
+                    </lay:StrategyPanel>
+                </lay:StrategyPanel>
+                <lay:StrategyPanel title="End Time" orientation="VERTICAL" collapsible="false">
+                    <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+                        <lay:Control ID="c_EnableDuration" xsi:type="lay:RadioButton_t" label="Duration In Minutes"
+                                     radioGroup="EndTimeRB"/>
+                        <lay:Control xsi:type="lay:TextField_t" ID="c_DurationClock" label="" initValue="00"
+                                     enabled="true" parameterRef="Duration In Minutes">
+                            <flow:StateRule enabled="false" value="{NULL}">
+                                <val:Edit field="c_EnableDuration" operator="EQ" value="false"/>
+                            </flow:StateRule>
+                        </lay:Control>
+                    </lay:StrategyPanel>
+
+                    <lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+                        <lay:Control ID="c_EnableEndTime" xsi:type="lay:RadioButton_t" label="Time" initValue="true"
+                                     radioGroup="EndTimeRB"/>
+                        <lay:Control ID="EndTimeClock" xsi:type="lay:Clock_t" label="" parameterRef="EndTime"
+                                     initValue="17:00:00" localMktTz="America/Toronto">
+                            <flow:StateRule enabled="false" value="{NULL}">
+                                <val:Edit field="c_EnableEndTime" operator="EQ" value="false"/>
+                            </flow:StateRule>
+                        </lay:Control>
+                    </lay:StrategyPanel>
+                </lay:StrategyPanel>
+            </lay:StrategyPanel>
+        </lay:StrategyLayout>
+        <val:StrategyEdit errorMessage="Start time must be less than end time.">
+            <val:Edit logicOperator="OR">
+                <val:Edit field="EndTime" operator="NX"/>
+                <val:Edit field="StartTime" operator="NX"/>
+                <val:Edit field="EndTime" operator="GT" field2="StartTime"/>
+            </val:Edit>
+        </val:StrategyEdit>
+
+        <val:StrategyEdit errorMessage="Duration need to be specified.">
+            <val:Edit logicOperator="OR">
+                <val:Edit field="Duration In Minutes" operator="NX"/>
+                <val:Edit field="Duration In Minutes" operator="NE" value="00"/>
+            </val:Edit>
+        </val:StrategyEdit>
+    </Strategy>
+
+</Strategies>

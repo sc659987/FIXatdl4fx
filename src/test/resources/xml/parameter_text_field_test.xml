@@ -1,0 +1,21 @@
+<Strategies
+        xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+        xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+        imageLocation="/images/banner.gif"
+        strategyIdentifierTag="847"
+        versionIdentifierTag="958">
+
+    <Strategy name="CheckBoxListTests" uiRep="CheckBoxList Tests" wireValue="1" providerID="TEST">
+    		<Parameter name="IWouldPrice" xsi:type="Price_t" fixTag="9999" use="optional" minValue="-10" maxValue="100"/>
+    		<lay:StrategyLayout>
+    			<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" title="Externally fed FIX_Price value">
+    					<lay:Control ID="IWouldPriceField" xsi:type="lay:TextField_t"
+                label="I Would Price" parameterRef="IWouldPrice"/>
+    			</lay:StrategyPanel>
+    		</lay:StrategyLayout>
+
+    </Strategy>
+
+</Strategies>

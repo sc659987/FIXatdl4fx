@@ -1,0 +1,149 @@
+<Strategies xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation"
+            xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+            xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            imageLocation="/images/banner.gif"
+            strategyIdentifierTag="847"
+            versionIdentifierTag="9682">
+
+
+    <Strategy name="StopLoss" uiRep="Stop Loss" wireValue="1000" providerID="BAML" version="BAML v9.7.6.3">
+        <Description>&lt;html&gt;&lt;div style=&quot;width:350px;&quot;&gt;Executes at the best available price once a
+            specified trigger price is reached.
+        </Description>
+
+        <Parameter name="StopPX" xsi:type="Price_t" fixTag="99" use="optional"/>
+
+        <Parameter name="_StartType" xsi:type="Char_t" fixTag="10002" use="optional">
+            <EnumPair enumID="Now" wireValue="0"/>
+            <EnumPair enumID="Date" wireValue="1"/>
+        </Parameter>
+        <Parameter name="EffectiveTime" xsi:type="UTCTimestamp_t" fixTag="168" use="optional"/>
+
+        <Parameter name="TimeInForce" xsi:type="Char_t" fixTag="59" use="required">
+            <EnumPair enumID="Day" wireValue="0"/>
+            <EnumPair enumID="GTD" wireValue="6"/>
+        </Parameter>
+
+        <Parameter name="ExpireTime" xsi:type="UTCTimestamp_t" fixTag="126" use="optional">
+            <Description>End order at selected time</Description>
+        </Parameter>
+
+        <Parameter name="StopTrigger" use="optional" fixTag="9017" xsi:type="String_t">
+            <EnumPair wireValue="Bid" enumID="Bid"/>
+            <EnumPair wireValue="Offer" enumID="Offer"/>
+            <EnumPair wireValue="Bid/Trade" enumID="BidTrade"/>
+            <EnumPair wireValue="Offer/Trade" enumID="OfferTrade"/>
+        </Parameter>
+
+        <Parameter name="TrailingStop" xsi:type="Boolean_t" fixTag="9027" use="optional" mutableOnCxlRpl="false"/>
+        <Parameter name="StopLossOffset" xsi:type="Amt_t" fixTag="9028" use="optional" minValue="0"/>
+        <Parameter name="AggressiveLimitPrice" xsi:type="Amt_t" fixTag="9032" use="required"/>
+
+        <Parameter name="OrdType" xsi:type="Char_t" fixTag="40" constValue="3"/>
+
+
+        <lay:StrategyLayout>
+            <lay:StrategyPanel collapsible="false" orientation="VERTICAL">
+
+                <lay:StrategyPanel title="Strategy Parameters" collapsible="false" orientation="VERTICAL">
+                    <lay:Control ID="c_StopPX" xsi:type="lay:TextField_t" label="Stop Price" parameterRef="StopPX"
+                                 tooltip="Will trade up to, but not beyond, your limit price"/>
+
+                    <lay:Control ID="c_AggressiveLimitPrice" xsi:type="lay:TextField_t" label="No Worse Than"
+                                 parameterRef="AggressiveLimitPrice"
+                                 tooltip="&lt;html&gt;&lt;div style=&quot;width:250px;&quot;&gt;Suggested value about 2% above trigger level for buy or 2% below for sell"/>
+
+                    <lay:Control ID="c_StopTrigger" xsi:type="lay:DropDownList_t" initValue="Bid"
+                                 parameterRef="StopTrigger"
+                                 label="Trigger"
+                                 tooltip="&lt;html&gt;&lt;div style=&quot;width:250px;&quot;&gt;Allows you to select bid, bid trade, offer or offer trade for stop loss order activation">
+                        <lay:ListItem enumID="Bid" uiRep="Bid"/>
+                        <lay:ListItem enumID="Offer" uiRep="Offer"/>
+                        <lay:ListItem enumID="BidTrade" uiRep="BidTrade"/>
+                        <lay:ListItem enumID="OfferTrade" uiRep="OfferTrade"/>
+                    </lay:Control>
+                    <lay:Control ID="c_TriggerInfo" xsi:type="lay:Label_t"
+                                 initValue="   Offer/OfferTrade for Sells. Bid/BidTrade for Buys"/>
+                    <lay:Control ID="c_TriggerInfoNote" xsi:type="lay:Label_t"
+                                 initValue="   (action is relevant to Base currency)"/>
+
+                    <lay:Control ID="c_EmptySpace" xsi:type="lay:Label_t" initValue=""/>
+
+                    <lay:Control ID="c_TrailingStop" xsi:type="lay:CheckBox_t" label="Trailing Stop"
+                                 initValue="false" parameterRef="TrailingStop" orientation="HORIZONTAL"
+                                 tooltip="&lt;html&gt;&lt;div style=&quot;width:250px;&quot;&gt;Allows you to dynamically readjust your stop level and take advantage of market moves in your favor. If the market moves against you, the stop loss order remains at the original level entered"/>
+
+                    <lay:Control ID="c_StopLossOffset" xsi:type="lay:TextField_t" label="Offset"
+                                 parameterRef="StopLossOffset">
+                        <flow:StateRule enabled="false" value="{NULL}">
+                            <val:Edit field="c_TrailingStop" operator="EQ" value="false"/>
+                        </flow:StateRule>
+                    </lay:Control>
+                </lay:StrategyPanel>
+
+
+                <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="Start">
+                    <lay:Control ID="c_StartType" xsi:type="lay:RadioButtonList_t" parameterRef="_StartType"
+                                 initValue="Now" orientation="VERTICAL">
+                        <lay:ListItem uiRep="Now" enumID="Now"/>
+                        <lay:ListItem uiRep="Date" enumID="Date"/>
+                    </lay:Control>
+
+                    <lay:Control ID="c_EffectiveTime" xsi:type="lay:Clock_t" label="" parameterRef="EffectiveTime">
+                        <flow:StateRule enabled="false" value="{NULL}">
+                            <val:Edit field="c_StartType" operator="NE" value="Date"/>
+                        </flow:StateRule>
+                    </lay:Control>
+                </lay:StrategyPanel>
+
+                <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="End">
+                    <lay:Control ID="c_TimeInForce" xsi:type="lay:RadioButtonList_t" parameterRef="TimeInForce"
+                                 initValue="Day" orientation="VERTICAL">
+                        <lay:ListItem uiRep="Day" enumID="Day"/>
+                        <lay:ListItem uiRep="Good Until" enumID="GTD"/>
+                    </lay:Control>
+
+                    <lay:Control ID="c_ExpireTime" xsi:type="lay:Clock_t" label="" parameterRef="ExpireTime">
+                        <flow:StateRule enabled="false" value="{NULL}">
+                            <val:Edit field="c_TimeInForce" operator="NE" value="GTD"/>
+                        </flow:StateRule>
+                    </lay:Control>
+
+                    <lay:Control ID="c_MultidayNotSupported" xsi:type="lay:Label_t"
+                                 initValue="* Multi-day orders are not supported.">
+                        <flow:StateRule visible="false">
+                            <val:Edit field="c_TimeInForce" operator="EQ" value="Day"/>
+                        </flow:StateRule>
+                    </lay:Control>
+                </lay:StrategyPanel>
+
+            </lay:StrategyPanel>
+        </lay:StrategyLayout>
+
+        <!-- validation rules -->
+        <val:StrategyEdit errorMessage="Start time must be less than end time.">
+            <val:Edit logicOperator="OR">
+                <val:Edit field="ExpireTime" operator="NX"/>
+                <val:Edit field="EffectiveTime" operator="NX"/>
+                <val:Edit field="ExpireTime" operator="GT" field2="EffectiveTime"/>
+            </val:Edit>
+        </val:StrategyEdit>
+
+        <val:StrategyEdit errorMessage="Stop price is mandatory when Trailing Stop is disabled.">
+            <val:Edit logicOperator="OR">
+                <val:Edit field="TrailingStop" operator="EQ" value="true"/>
+                <val:Edit field="StopPX" operator="EX"/>
+            </val:Edit>
+        </val:StrategyEdit>
+
+        <val:StrategyEdit errorMessage="Stop loss offset is mandatory when Trailing Stop is active.">
+            <val:Edit logicOperator="OR">
+                <val:Edit field="StopLossOffset" operator="EX"/>
+                <val:Edit field="TrailingStop" operator="EQ" value="false"/>
+            </val:Edit>
+        </val:StrategyEdit>
+    </Strategy>
+</Strategies>

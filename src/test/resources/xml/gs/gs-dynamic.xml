@@ -1,0 +1,108 @@
+<!-- Version: $Revision: 1.15 $  -->
+<Strategies
+        xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+        xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation"
+        xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+        xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+        strategyIdentifierTag="9000"
+        >
+    <Strategy name="Dynamic" uiRep="Dynamic" wireValue="DYNAMIC" version="1" fixMsgType="D" providerID="GS">
+		<Description>&lt;html&gt;Execute order up to a ‘No Worse Than’&lt;br/&gt;price using a series of market orders&lt;/html&gt;</Description>
+
+        <Parameter name="AlgoStartTime" xsi:type="UTCTimestamp_t" fixTag="9001" use="optional">
+            <Description>Strategy Start Time</Description>
+        </Parameter>
+
+        <Parameter name="NoWorseThan" xsi:type="Float_t" fixTag="9005" use="required">
+            <Description>Algo will not execute beyond the specified price</Description>
+        </Parameter>
+
+        <Parameter name="ExecutionStyle" xsi:type="Char_t" fixTag="9008" use="required">
+			<Description>&lt;html&gt;
+The filling strategy to be used on the order:&lt;br/&gt;
+&lt;li&gt;Hybrid &#x2013; Adaptive execution using passive and aggressive orders.&lt;/li&gt;
+&lt;li&gt;Aggressive &#x2013; Sweep available liquidity up to No Worse Than Level.&lt;/li&gt;
+&lt;li&gt;Iceberg &#x2013; Behaves as Aggressive but additionally shows passive&lt;br/&gt;interest at No Worse Than level which replenishes when filled.&lt;/li&gt;
+&lt;/html&gt;
+            </Description>
+            <EnumPair enumID="Hybrid" wireValue="3"/>
+            <EnumPair enumID="Aggressive" wireValue="2"/>
+            <EnumPair enumID="Iceberg" wireValue="4"/>
+        </Parameter>
+
+        <Parameter name="DisplayAmount" xsi:type="Int_t" fixTag="9013" use="optional">
+			<Description>&lt;html&gt;The quantity to be shown on the order book at No Worse Than level,&lt;br/&gt; when the market is worse than specified No Worse Than price&lt;/html&gt;</Description>
+            <EnumPair enumID="A1m" wireValue="1000000"/>
+            <EnumPair enumID="A2m" wireValue="2000000"/>
+            <EnumPair enumID="A3m" wireValue="3000000"/>
+            <EnumPair enumID="A4m" wireValue="4000000"/>
+            <EnumPair enumID="A5m" wireValue="5000000"/>
+        </Parameter>
+
+        <Parameter name="TimeInForce" xsi:type="Char_t" fixTag="59" use="required">
+            <EnumPair enumID="Day" wireValue="0"/>
+        </Parameter>
+
+        <Parameter name="GoodUntilTime" xsi:type="UTCTimestamp_t" fixTag="126" use="optional">
+            <Description>End order at selected time</Description>
+        </Parameter>
+
+        <!--Description and Layout of GUI controls-->
+        <lay:StrategyLayout>
+
+            <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="">
+
+                <lay:StrategyPanel collapsible="false" orientation="VERTICAL">
+
+                    <lay:Control xsi:type="lay:TextField_t" ID="NoWorseThan" label="No Worse Than Level" parameterRef="NoWorseThan"/>
+
+                </lay:StrategyPanel>
+
+                <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="Start Time (Default is NOW)">
+                    <lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+            				    <lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+                            <lay:Control tooltip="Start at the selected time" ID="EnableStartTime" xsi:type="lay:CheckBox_t" initValue="false" label="At:"/>
+                        </lay:StrategyPanel>
+            				    <lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+                          <lay:Control ID="StartTimeClock" xsi:type="lay:Clock_t" label="" parameterRef="AlgoStartTime">
+                              <flow:StateRule enabled="false" value="{NULL}">
+                                  <val:Edit field="EnableStartTime" operator="EQ" value="false"/>
+                              </flow:StateRule>
+                          </lay:Control>
+                      </lay:StrategyPanel>
+                    </lay:StrategyPanel>
+                </lay:StrategyPanel>
+
+                <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="Execution Style">
+                    <lay:Control ID="execstyle" xsi:type="lay:Slider_t" label="" parameterRef="ExecutionStyle" initValue="Hybrid">
+                        <lay:ListItem enumID="Hybrid" uiRep="Hybrid"/>
+                        <lay:ListItem enumID="Aggressive" uiRep="Aggressive"/>
+                        <lay:ListItem enumID="Iceberg" uiRep="Iceberg"/>
+                    </lay:Control>
+
+                    <lay:Control xsi:type="lay:DropDownList_t" ID="DisplayAmount" label="Display Amount" parameterRef="DisplayAmount">
+                        <flow:StateRule enabled="false" value="{NULL}">
+                            <val:Edit field="execstyle" operator="NE" value="Iceberg"/>
+                        </flow:StateRule>
+                        <lay:ListItem enumID="A1m" uiRep="1,000,000"/>
+                        <lay:ListItem enumID="A2m" uiRep="2,000,000"/>
+                        <lay:ListItem enumID="A3m" uiRep="3,000,000"/>
+                        <lay:ListItem enumID="A4m" uiRep="4,000,000"/>
+                        <lay:ListItem enumID="A5m" uiRep="5,000,000"/>
+                    </lay:Control>
+                </lay:StrategyPanel>
+
+                <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="Good Until">
+                    <lay:Control ID="GoodUntil" xsi:type="lay:RadioButtonList_t" parameterRef="TimeInForce" initValue="Day" orientation="VERTICAL">
+                        <lay:ListItem uiRep="Day" enumID="Day"/>
+                    </lay:Control>
+
+                </lay:StrategyPanel>
+
+            </lay:StrategyPanel>
+
+        </lay:StrategyLayout>
+    </Strategy>
+</Strategies>

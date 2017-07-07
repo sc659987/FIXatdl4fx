@@ -1,0 +1,125 @@
+<Strategies xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation"
+            xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+            xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            imageLocation="/images/banner.gif"
+            strategyIdentifierTag="847"
+            versionIdentifierTag="9682">
+
+    <Strategy name="Whisper" uiRep="Whisper" wireValue="1008" providerID="BAML" version="BAML v9.7.6.3">
+        <Description>&lt;html&gt;&lt;div style=&quot;width:350px;&quot;&gt;Executes quietly inside the bid/offer spread
+            in BofAML internal liquidity pool. It does not execute orders in the primary markets or other ECNs and is
+            designed to significantly reduce market impact.
+        </Description>
+
+        <Parameter name="LimitPrice" xsi:type="Price_t" fixTag="44" use="required"/>
+
+        <Parameter name="TimeInForce" xsi:type="Char_t" fixTag="59" use="required">
+            <EnumPair enumID="Day" wireValue="0"/>
+            <EnumPair enumID="GTD" wireValue="6"/>
+        </Parameter>
+
+        <Parameter name="ExpireTime" xsi:type="UTCTimestamp_t" fixTag="126" use="optional">
+            <Description>End order at selected time</Description>
+        </Parameter>
+
+        <Parameter name="_StartType" xsi:type="Char_t" fixTag="10002" use="optional">
+            <EnumPair enumID="Now" wireValue="0"/>
+            <EnumPair enumID="Date" wireValue="1"/>
+        </Parameter>
+        <Parameter name="EffectiveTime" xsi:type="UTCTimestamp_t" fixTag="168" use="optional"/>
+
+        <Parameter name="Urgency" xsi:type="Int_t" fixTag="9022" use="optional" minValue="0" maxValue="100"/>
+        <Parameter name="TakeProfitPrice" xsi:type="Amt_t" fixTag="9023" use="optional"/>
+        <Parameter name="UseAverage" xsi:type="Char_t" falseWireValue="0" trueWireValue="1" fixTag="9024"
+                   use="optional">
+            <EnumPair enumID="No" wireValue="0"/>
+            <EnumPair enumID="Yes" wireValue="1"/>
+        </Parameter>
+
+        <Parameter name="WhenLimited" xsi:type="Char_t" fixTag="9025" use="optional">
+            <EnumPair enumID="Pause" wireValue="1"/>
+            <EnumPair enumID="Expedite" wireValue="2"/>
+        </Parameter>
+
+        <lay:StrategyLayout>
+            <lay:StrategyPanel collapsible="false" orientation="VERTICAL">
+
+                <lay:StrategyPanel title="Strategy Parameters" collapsible="false" orientation="VERTICAL">
+                    <lay:Control ID="c_LimitPrice" xsi:type="lay:TextField_t" label="Limit Price"
+                                 parameterRef="LimitPrice"
+                                 tooltip="Will trade up to, but not beyond, your limit price"/>
+
+                    <lay:Control ID="c_Urgency" xsi:type="lay:SingleSpinner_t" initValue="50" label="Urgency"
+                                 parameterRef="Urgency"
+                                 tooltip="&lt;html&gt;&lt;div style=&quot;width:250px;&quot;&gt;Allows the user to select what % of the spread they want to be bid/offered at. For example 0% will be bid/offer, 50% at mid. The default value is 50%"/>
+
+                    <lay:Control ID="c_WhenLimited" xsi:type="lay:DropDownList_t" parameterRef="WhenLimited"
+                                 label="If Limit" initValue="Pause"
+                                 tooltip="&lt;html&gt;&lt;div style=&quot;width:250px;&quot;&gt;Allows user to control behaviour when close to limit. “Expedite” speeds up execution (slippage possible). “Pause” pulls out of the market and waits. Default value is “Pause”">
+                        <lay:ListItem uiRep="Pause" enumID="Pause"/>
+                        <lay:ListItem uiRep="Expedite" enumID="Expedite"/>
+                    </lay:Control>
+
+                    <lay:Control ID="c_UseAverage" xsi:type="lay:CheckBox_t" label="Avg Limit Price"
+                                 initValue="false" parameterRef="UseAverage" orientation="HORIZONTAL"
+                                 checkedEnumRef="Yes" uncheckedEnumRef="No"
+                                 tooltip="Will use average price as the limit"/>
+
+                    <lay:Control ID="c_TakeProfitPrice" xsi:type="lay:TextField_t" label="TP Price"
+                                 parameterRef="TakeProfitPrice" orientation="HORIZONTAL"
+                                 tooltip="&lt;html&gt;&lt;div style=&quot;width:250px;&quot;&gt;Turns Whisper into a Take Profit order at this price, allowing the user to lock in favourable moves"/>
+
+                </lay:StrategyPanel>
+
+
+                <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="Start">
+                    <lay:Control ID="c_StartType" xsi:type="lay:RadioButtonList_t" parameterRef="_StartType"
+                                 initValue="Now" orientation="VERTICAL">
+                        <lay:ListItem uiRep="Now" enumID="Now"/>
+                        <lay:ListItem uiRep="Date" enumID="Date"/>
+                    </lay:Control>
+
+                    <lay:Control ID="c_EffectiveTime" xsi:type="lay:Clock_t" label="" parameterRef="EffectiveTime">
+                        <flow:StateRule enabled="false" value="{NULL}">
+                            <val:Edit field="c_StartType" operator="NE" value="Date"/>
+                        </flow:StateRule>
+                    </lay:Control>
+                </lay:StrategyPanel>
+
+
+                <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="End">
+                    <lay:Control ID="c_TimeInForce" xsi:type="lay:RadioButtonList_t" parameterRef="TimeInForce"
+                                 initValue="Day" orientation="VERTICAL">
+                        <lay:ListItem uiRep="Day" enumID="Day"/>
+                        <lay:ListItem uiRep="Good Until" enumID="GTD"/>
+                    </lay:Control>
+
+                    <lay:Control ID="c_ExpireTime" xsi:type="lay:Clock_t" label="" parameterRef="ExpireTime">
+                        <flow:StateRule enabled="false" value="{NULL}">
+                            <val:Edit field="c_TimeInForce" operator="NE" value="GTD"/>
+                        </flow:StateRule>
+                    </lay:Control>
+
+                    <lay:Control ID="c_MultidayNotSupported" xsi:type="lay:Label_t"
+                                 initValue="* Multi-day orders are not supported.">
+                        <flow:StateRule visible="false">
+                            <val:Edit field="c_TimeInForce" operator="EQ" value="Day"/>
+                        </flow:StateRule>
+                    </lay:Control>
+                </lay:StrategyPanel>
+            </lay:StrategyPanel>
+        </lay:StrategyLayout>
+
+        <!-- validation rules -->
+        <val:StrategyEdit errorMessage="Start time must be less than end time.">
+            <val:Edit logicOperator="OR">
+                <val:Edit field="ExpireTime" operator="NX"/>
+                <val:Edit field="EffectiveTime" operator="NX"/>
+                <val:Edit field="ExpireTime" operator="GT" field2="EffectiveTime"/>
+            </val:Edit>
+        </val:StrategyEdit>
+    </Strategy>
+</Strategies>

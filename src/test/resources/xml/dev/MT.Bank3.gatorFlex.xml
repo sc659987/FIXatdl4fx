@@ -1,0 +1,159 @@
+<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+	xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation"
+	xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout" xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+	strategyIdentifierTag="847" versionIdentifierTag="958">
+
+	<Strategy name="GatorFlex" uiRep="Gator Flex" wireValue="2005"
+		providerID="">
+
+		<!-- Common parameters -->
+		<Parameter name="startTime" xsi:type="UTCTimestamp_t" use="optional" />
+		<Parameter name="endTime" xsi:type="UTCTimestamp_t" use="optional" />
+		<Parameter name="fillBalanceTriggered" xsi:type="Boolean_t"
+			use="optional">
+			<EnumPair enumID="e_NotSet" wireValue="{NULL}" />
+			<EnumPair enumID="e_YES" wireValue="Y" />
+		</Parameter>
+		<Parameter name="orderBatchCount" xsi:type="Int_t" use="optional" />
+		<Parameter name="orderBatchInstance" xsi:type="Int_t" use="optional" />
+
+		<!-- GatorFlex parameters -->
+		<Parameter name="targetExecutionRate" xsi:type="Float_t"
+			use="required" minValue="0" maxValue="1" />
+		<Parameter name="passiveOnPrimaryMarketOnly" xsi:type="String_t"
+			use="required">
+			<EnumPair enumID="e_Yes" wireValue="Y" />
+			<EnumPair enumID="e_No" wireValue="N" />
+		</Parameter>
+		<Parameter name="durationQuoteId" xsi:type="String_t" use="optional" />
+
+
+		<lay:StrategyLayout>
+
+			<lay:StrategyPanel title="Strategy Parameters"
+				collapsible="false" orientation="HORIZONTAL">
+
+				<lay:StrategyPanel title="Common Parameters"
+					collapsible="false" orientation="VERTICAL">
+					<!-- Start time -->
+					<lay:StrategyPanel collapsible="false"
+						orientation="HORIZONTAL" title="Start Time">
+						<lay:Control ID="c_NoStartTime" xsi:type="lay:RadioButton_t"
+							label="Now" initValue="true" radioGroup="StartTimeRB" />
+						<lay:Control ID="c_EnableStartTime" xsi:type="lay:RadioButton_t"
+							label="" radioGroup="StartTimeRB" />
+						<lay:Control ID="c_StartTime" xsi:type="lay:Clock_t"
+							label="" parameterRef="startTime">
+							<flow:StateRule enabled="false" value="{NULL}">
+								<val:Edit field="c_EnableStartTime" operator="EQ"
+									value="false" />
+							</flow:StateRule>
+						</lay:Control>
+					</lay:StrategyPanel>
+
+					<!-- End time -->
+					<lay:StrategyPanel collapsible="false"
+						orientation="HORIZONTAL" title="End Time">
+						<lay:Control ID="c_NoEndTime" xsi:type="lay:RadioButton_t"
+							label="GTC" initValue="true" radioGroup="EndTimeRB" />
+						<lay:Control ID="c_EnableEndTime" xsi:type="lay:RadioButton_t"
+							label="" radioGroup="EndTimeRB" />
+						<lay:Control ID="c_EndTime" xsi:type="lay:Clock_t"
+							label="" parameterRef="endTime">
+							<flow:StateRule enabled="false" value="{NULL}">
+								<val:Edit field="c_EnableEndTime" operator="EQ" value="false" />
+							</flow:StateRule>
+						</lay:Control>
+					</lay:StrategyPanel>
+
+					<!-- Other common params -->
+					<lay:StrategyPanel collapsible="false"
+						orientation="VERTICAL" title="">
+						<lay:Control ID="c_FillBalanceTriggered" xsi:type="lay:DropDownList_t"
+							label="FillBalanceTriggered" parameterRef="fillBalanceTriggered">
+							<lay:ListItem enumID="e_NotSet" uiRep="" />
+							<lay:ListItem enumID="e_YES" uiRep="Yes" />
+						</lay:Control>
+						<lay:Control ID="c_OrderBatchCount" xsi:type="lay:TextField_t"
+							label="Order Batch Count" parameterRef="orderBatchCount" />
+						<lay:Control ID="c_OrderBatchInstance" xsi:type="lay:TextField_t"
+							label="Order Batch Instance" parameterRef="orderBatchInstance" />
+					</lay:StrategyPanel>
+				</lay:StrategyPanel>
+
+				<lay:StrategyPanel title="Gator Flex Parameters"
+					collapsible="false" orientation="VERTICAL">
+					<lay:Control ID="c_TargetExecutionRate" xsi:type="lay:SingleSpinner_t"
+						label="Target Execution Rate" parameterRef="targetExecutionRate"
+						increment="0.01" />
+					<lay:Control ID="c_PassiveOnPrimaryMarketOnly"
+						xsi:type="lay:RadioButtonList_t" label="Passive On Primary Market Only"
+						parameterRef="passiveOnPrimaryMarketOnly">
+						<lay:ListItem enumID="e_Yes" uiRep="Yes" />
+						<lay:ListItem enumID="e_No" uiRep="No" />
+					</lay:Control>
+					<lay:Control ID="c_DurationQuoteId" xsi:type="lay:TextField_t"
+						label="Duration Quote Id" parameterRef="durationQuoteId" />
+				</lay:StrategyPanel>
+			</lay:StrategyPanel>
+		</lay:StrategyLayout>
+
+		<!-- **************************** -->
+		<!-- Common parameter constraints -->
+		<!-- **************************** -->
+		<val:StrategyEdit errorMessage="Start Time must precede End Time.">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="startTime" operator="NX" />
+				<val:Edit field="endTime" operator="NX" />
+				<val:Edit field="startTime" operator="LT" field2="endTime" />
+			</val:Edit>
+		</val:StrategyEdit>
+
+		<val:StrategyEdit
+			errorMessage="fillBalanceTriggered can only be appiled in Cancel Replace Request (MsgType=G) messages.">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="fillBalanceTriggered" operator="NX" />
+				<val:Edit field="FIX_MsgType" operator="EQ" value="G" />
+			</val:Edit>
+		</val:StrategyEdit>
+
+		<val:StrategyEdit
+			errorMessage="Both orderBatchCount and orderBatchInstance must exist or neither of them">
+			<val:Edit logicOperator="OR">
+				<val:Edit logicOperator="AND">
+					<val:Edit field="orderBatchCount" operator="NX" />
+					<val:Edit field="orderBatchInstance" operator="NX" />
+				</val:Edit>
+				<val:Edit logicOperator="AND">
+					<val:Edit field="orderBatchCount" operator="EX" />
+					<val:Edit field="orderBatchInstance" operator="EX" />
+				</val:Edit>
+			</val:Edit>
+		</val:StrategyEdit>
+
+		<val:StrategyEdit errorMessage="orderBatchInstance must be equal or greater than 1">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="orderBatchInstance" operator="NX" />
+				<val:Edit field="orderBatchInstance" operator="GE" value="1" />
+			</val:Edit>
+		</val:StrategyEdit>
+
+		<val:StrategyEdit
+			errorMessage="orderBatchInstance must be equal or less than orderBatchCount">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="orderBatchInstance" operator="NX" />
+				<val:Edit field="orderBatchInstance" operator="LE"
+					field2="orderBatchCount" />
+			</val:Edit>
+		</val:StrategyEdit>
+
+
+		<!-- ******************************** -->
+		<!-- Gator Flex parameter constraints -->
+		<!-- ******************************** -->
+
+
+	</Strategy>
+</Strategies>

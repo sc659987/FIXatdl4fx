@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Credit Suisse AES(R) FIX ATDL - FX -->
+<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core" xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation" xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout" xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow" xmlns:tz="http://www.fixprotocol.org/FIXatdl-1-1/Timezones"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core fixatdl-core-1-1.xsd" strategyIdentifierTag="6061" versionIdentifierTag="10008" imageLocation="CreditSuisse_logo.gif" changeStrategyOnCxlRpl="true">
+	<!-- **** FLOAT GUERRILLA **** -->
+	<Strategy name="FLOAT_GUERRILLA" uiRep="Float Guerrilla" wireValue="FA" version="ATDL.2010" providerID="Credit Suisse" fixMsgType="D">
+		<Regions>
+			<Region name="TheAmericas" inclusion="Include" />
+			<Region name="AsiaPacificJapan" inclusion="Include" />
+			<Region name="EuropeMiddleEastAfrica" inclusion="Include" />
+		</Regions>
+		<SecurityTypes>
+			<SecurityType name="FOR" inclusion="Include" />
+		</SecurityTypes>
+		<!-- Strategy Parameters -->
+		<Parameter name="HandlInst" xsi:type="Char_t" fixTag="21" definedByFIX="true" constValue="1" use="required" />
+		<Parameter name="OrdType" xsi:type="Char_t" fixTag="40" use="required" mutableOnCxlRpl="true">
+			<EnumPair enumID="MKT" wireValue="1" />
+			<EnumPair enumID="Limit" wireValue="2" />
+			<EnumPair enumID="Stop" wireValue="3" />
+			<EnumPair enumID="StopLimit" wireValue="4" />
+		</Parameter>
+		<Parameter name="Price" xsi:type="Price_t" fixTag="44" use="optional" precision="5" mutableOnCxlRpl="true" />
+		<Parameter name="StopPx" xsi:type="Price_t" fixTag="99" use="optional" precision="5" mutableOnCxlRpl="true" />
+		<Parameter name="TIF" xsi:type="Char_t" fixTag="59" use="optional" definedByFIX="true" mutableOnCxlRpl="false">
+			<EnumPair enumID="Day" wireValue="0" />
+<!--			<EnumPair enumID="GTC" wireValue="1" />
+			<EnumPair enumID="GTD" wireValue="6" />-->
+		</Parameter>
+		<Parameter name="ExpireTime" xsi:type="UTCTimestamp_t" fixTag="126" definedByFIX="true" use="optional" mutableOnCxlRpl="false" />
+		<Parameter name="ExpireDate" xsi:type="LocalMktDate_t" fixTag="10999" definedByFIX="true" use="optional" mutableOnCxlRpl="false" />
+
+		<Parameter name="StartTime" xsi:type="UTCTimeOnly_t" fixTag="6062" use="optional" mutableOnCxlRpl="true" />
+		<Parameter name="EndTime" xsi:type="UTCTimeOnly_t" fixTag="6063" use="optional" mutableOnCxlRpl="true" />
+		<Parameter name="ExecutionStyle" xsi:type="String_t" fixTag="6065" use="optional" mutableOnCxlRpl="true">
+			<EnumPair enumID="Patient" wireValue="2" />
+			<EnumPair enumID="Normal" wireValue="5" />
+			<EnumPair enumID="Aggressive" wireValue="8" />
+		</Parameter>
+		<Parameter name="MinPctVolume" xsi:type="Int_t" fixTag="6067" use="optional" mutableOnCxlRpl="true" minValue="0" maxValue="99" />
+		<Parameter name="MaxPctVolume" xsi:type="Int_t" fixTag="6064" use="optional" mutableOnCxlRpl="true" minValue="0" maxValue="99" />
+		<Parameter name="DisplaySize" xsi:type="Qty_t" fixTag="6066" use="optional" mutableOnCxlRpl="true" minValue="1000000" />
+		<Parameter name="Trigger" xsi:type="String_t" fixTag="6075" use="optional" maxLength="75" mutableOnCxlRpl="true" />
+
+		<Parameter name="Trigger_TriggerType" xsi:type="String_t" fixTag="11000" use="optional" mutableOnCxlRpl="true">
+			<EnumPair enumID="NO_VALUE" wireValue=" " />
+			<EnumPair enumID="Contingent Trigger" wireValue="IT" />
+			<EnumPair enumID="I-Would" wireValue="IW" />
+			<EnumPair enumID="Reverse I-Would" wireValue="RIW" />
+			<EnumPair enumID="Non Farm Payroll" wireValue="NFP" />
+			<EnumPair enumID="Initial Jobless Claims" wireValue="IJC" />
+			<EnumPair enumID="Trailing Stop" wireValue="TRAIL" />
+		</Parameter>
+		<Parameter name="Trigger_ContingentTriggerSymbol" xsi:type="String_t" fixTag="11001" use="optional" mutableOnCxlRpl="true" />
+		<Parameter name="Trigger_ConditionalOperator" xsi:type="String_t" fixTag="11002" use="optional" mutableOnCxlRpl="true">
+			<EnumPair enumID="Greater Than" wireValue="&gt;" />
+			<EnumPair enumID="Less Than" wireValue="&lt;" />
+			<EnumPair enumID="Equals" wireValue="=" />
+			<EnumPair enumID="Greater Than or Equal" wireValue="&gt;=" />
+			<EnumPair enumID="Less Than or Equal" wireValue="&lt;=" />
+		</Parameter>
+		<Parameter name="Trigger_ContingentTriggerPrice" xsi:type="Price_t" fixTag="11003" use="optional" mutableOnCxlRpl="true" />
+		<Parameter name="Trigger_EconomicReleaseLevel" xsi:type="Int_t" fixTag="11004" use="optional" mutableOnCxlRpl="true" />
+		<Parameter name="Trigger_IWouldPrice" xsi:type="Price_t" fixTag="11005" use="optional" precision="5" mutableOnCxlRpl="true" />
+		<Parameter name="Trigger_BasketConstituent" xsi:type="Int_t" fixTag="11006" use="optional" mutableOnCxlRpl="true">
+			<EnumPair enumID="BasketID_1" wireValue="1" />
+			<EnumPair enumID="BasketID_2" wireValue="2" />
+			<EnumPair enumID="BasketID_3" wireValue="3" />
+		</Parameter>
+		<Parameter name="Trigger_TrailingStopRefPx" xsi:type="Price_t" fixTag="11010" use="optional" precision="5" mutableOnCxlRpl="true" />
+		<Parameter name="Trigger_TrailingStopStep" xsi:type="Int_t" fixTag="11011" use="optional" mutableOnCxlRpl="true" />
+
+		<!--- START GUI LAYOUT -->
+		<lay:StrategyLayout>
+			<lay:StrategyPanel collapsible="false" title="Credit Suisse - Advanced Execution Services FX" orientation="VERTICAL">
+				<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+				  <lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" title="Description">
+            <lay:Control ID="Description" xsi:type="lay:Label_t" label="&lt;html&gt;Float Guerrilla combines the opportunistic nature of the&lt;br/&gt;Guerrilla strategy to trade aggressively when conditions&lt;br/&gt;are favourable, but additionally places a small portion&lt;br/&gt;of your order on the orderbook to capture spread.&lt;/html&gt;" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+				<!-- START BASIC PARAMETERS -->
+				<!-- START 1st row -->
+				<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+					<!-- START Execution Style -->
+					<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" title="Execution Style">
+						<lay:Control ID="ExecStyle" xsi:type="lay:Slider_t" initValue="Normal" parameterRef="ExecutionStyle">
+							<lay:ListItem uiRep="Patient" enumID="Patient" />
+							<lay:ListItem uiRep="Normal" enumID="Normal" />
+							<lay:ListItem uiRep="Aggressive" enumID="Aggressive" />
+						</lay:Control>
+					</lay:StrategyPanel>
+					<!-- END Execution Style -->
+					<!-- START Display Size -->
+					<lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="Display Size">
+						<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+							<lay:Control ID="OptimalDisplaySize" xsi:type="lay:RadioButton_t" label="Optimal" initValue="true" radioGroup="Display Size RB" tooltip="The 'Optimal' option will allow the AES FX strategy to dynamically calculate a display size according to the prevailing market conditions." >
+							  <flow:StateRule value="false">
+								  <val:Edit field="ManualDisplaySize" operator="EX"/>
+								</flow:StateRule>
+							</lay:Control>
+						</lay:StrategyPanel>
+						<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+							<lay:Control ID="EnableDisplaySize" xsi:type="lay:RadioButton_t" label="Manual" radioGroup="Display Size RB" tooltip="User specified value to be used as a static display size." />
+							<lay:Control ID="ManualDisplaySize" xsi:type="lay:SingleSpinner_t" increment="1000000" parameterRef="DisplaySize">
+								<flow:StateRule enabled="false" value="{NULL}">
+									<val:Edit field="EnableDisplaySize" operator="EQ" value="false" />
+								</flow:StateRule>
+							</lay:Control>
+						</lay:StrategyPanel>
+					</lay:StrategyPanel>
+					<!-- END Display Size -->
+				</lay:StrategyPanel>
+				<!-- END 1st Row -->
+
+				<!-- START 2nd row -->
+				<!-- START Order Type -->
+				<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" title="Order Type">
+					<lay:Control ID="OrderType" xsi:type="lay:DropDownList_t" label="" parameterRef="OrdType" tooltip="List of supported order types for AES FX strategies.">
+						<lay:ListItem uiRep="Market" enumID="MKT" />
+						<lay:ListItem uiRep="Limit" enumID="Limit" />
+						<lay:ListItem uiRep="Stop" enumID="Stop" />
+						<lay:ListItem uiRep="Stop Limit" enumID="StopLimit" />
+					</lay:Control>
+					<lay:Control ID="Price" xsi:type="lay:TextField_t" label="Limit Rate" parameterRef="Price" tooltip="Rate required for 'Limit' and 'Stop Limit' order types.">
+						<flow:StateRule enabled="false" value="{NULL}">
+							<val:Edit logicOperator="OR">
+								<val:Edit field="OrderType" operator="EQ" value="MKT" />
+								<val:Edit field="OrderType" operator="EQ" value="Stop" />
+							</val:Edit>
+						</flow:StateRule>
+					</lay:Control>
+					<lay:Control ID="StopPx" xsi:type="lay:TextField_t" label="Stop Rate" parameterRef="StopPx" tooltip="Rate required for 'Stop' and 'Stop Limit' order types.">
+						<flow:StateRule enabled="false" value="{NULL}">
+							<val:Edit logicOperator="OR">
+								<val:Edit field="OrderType" operator="EQ" value="MKT" />
+								<val:Edit field="OrderType" operator="EQ" value="Limit" />
+							</val:Edit>
+						</flow:StateRule>
+					</lay:Control>
+				</lay:StrategyPanel>
+				<!-- END Order Type -->
+				<!-- END 2nd row -->
+				<!-- END BASIC PARAMETERS -->
+
+				<!-- START ADVANCED PARAMETERS -->
+				<lay:StrategyPanel collapsible="true" collapsed="false" orientation="VERTICAL" title="Advanced Settings">
+					<!-- START 1st row -->
+					<!-- START Time In Force -->
+					<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+						<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+						<lay:Control ID="TIF" xsi:type="lay:DropDownList_t" label="Time In Force" parameterRef="TIF" tooltip="List of supported trade durations for AES FX strategies.">
+							<lay:ListItem uiRep="Day" enumID="Day" />
+<!--							<lay:ListItem uiRep="Good Till Date" enumID="GTD" />
+							<lay:ListItem uiRep="Good Till Cancel" enumID="GTC" />-->
+						</lay:Control>
+						</lay:StrategyPanel>
+						<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+						<lay:Control ID="ExpireDate" xsi:type="lay:Clock_t" displayDate="true" editDate="true" parameterRef="ExpireDate">
+							<flow:StateRule enabled="false" value="{NULL}">
+								<val:Edit field="TIF" operator="NE" value="GTD" />
+							</flow:StateRule>
+						</lay:Control>
+						<!--<lay:Control ID="ExpireTime" xsi:type="lay:Clock_t" displayDate="true" editDate="true" parameterRef="ExpireTime"> <flow:StateRule enabled="false"> <val:Edit field="TIF" operator="NE" value="GTD"/> </flow:StateRule> </lay:Control> -->
+					</lay:StrategyPanel>
+					</lay:StrategyPanel>
+					<!-- END Time In Force -->
+					<!-- END 1st row -->
+
+					<!-- START 2nd row -->
+					<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+						<!-- START Time Parameters -->
+						<lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="Time Parameters">
+							<!-- START Start Time -->
+							<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+								<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+								<lay:Control ID="StartTimeSelection" xsi:type="lay:DropDownList_t" label="Start" tooltip="AES FX strategy start time (EST time zone), defaulted to the present time (Now) unless overriden.">
+									<lay:ListItem enumID="Now" uiRep="Now" />
+									<lay:ListItem enumID="User Defined" uiRep="Override" />
+									<flow:StateRule value="User Defined">
+										<val:Edit field="StartTimeClock" operator="EX" />
+									</flow:StateRule>
+								</lay:Control>
+								</lay:StrategyPanel>
+								<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+								<lay:Control ID="StartTimeClock" xsi:type="lay:Clock_t" label="" parameterRef="StartTime">
+									<flow:StateRule enabled="false" value="{NULL}">
+										<val:Edit field="StartTimeSelection" operator="EQ" value="Now" />
+									</flow:StateRule>
+								</lay:Control>
+							</lay:StrategyPanel>
+							</lay:StrategyPanel>
+							<!-- END Start Time -->
+							<!-- START End Time -->
+							<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+								<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+								<lay:Control ID="StopTimeSelection" xsi:type="lay:DropDownList_t" label="  End" tooltip="AES FX strategy end time (EST time zone), defaulted to the currency pair's value-date rollover time (7am Wellington for NZD crosses, 5pm EST for non-NZD crosses) unless overriden.">
+									<lay:ListItem enumID="End of Day" uiRep="Close" />
+									<lay:ListItem enumID="User Defined" uiRep="Override" />
+									<flow:StateRule value="User Defined">
+										<val:Edit field="EndTimeClock" operator="EX" />
+									</flow:StateRule>
+								</lay:Control>
+								</lay:StrategyPanel>
+								<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+								<lay:Control ID="EndTimeClock" xsi:type="lay:Clock_t" label="" parameterRef="EndTime">
+									<flow:StateRule enabled="false" value="{NULL}">
+										<val:Edit field="StopTimeSelection" operator="EQ" value="End of Day" />
+									</flow:StateRule>
+								</lay:Control>
+							</lay:StrategyPanel>
+							</lay:StrategyPanel>
+							<!-- END End Time -->
+						</lay:StrategyPanel>
+						<!-- END Time Parameters -->
+						<!-- START Volume Participation -->
+						<lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="Volume Participation">
+							<lay:Control ID="MinPctVolume" xsi:type="lay:SingleSpinner_t" label="  Minimum %" parameterRef="MinPctVolume" increment="5" tooltip="Minimum percentage restriction to the strategy's volume participation.">
+								<flow:StateRule enabled="false">
+									<val:Edit field="MinPctVolume" operator="NX" />
+								</flow:StateRule>
+							</lay:Control>
+							<lay:Control ID="MaxPctVolume" xsi:type="lay:SingleSpinner_t" label="  Maximum %" parameterRef="MaxPctVolume" increment="5" tooltip="Maximum percentage restriction to the strategy's volume participation." />
+						</lay:StrategyPanel>
+						<!-- END Volume Participation -->
+					</lay:StrategyPanel>
+					<!-- END 2nd row -->
+
+					<!-- START 3rd row -->
+					<!-- START Trigger -->
+					<lay:StrategyPanel collapsible="true" collapsed="true" orientation="VERTICAL" title="Trigger">
+						<!-- START Trigger Drop-Down -->
+						<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+							<lay:Control ID="TriggerCommands" xsi:type="lay:DropDownList_t" label="Trigger Type" parameterRef="Trigger_TriggerType" tooltip="List of supported trigger commands for AES FX strategies.">
+								<lay:ListItem enumID="NO_VALUE" uiRep="" />
+								<lay:ListItem enumID="Contingent Trigger" uiRep="Contingent Trigger" />
+								<lay:ListItem enumID="Non Farm Payroll" uiRep="Non Farm Payroll" />
+								<lay:ListItem enumID="Initial Jobless Claims" uiRep="Initial Jobless Claims" />
+								<lay:ListItem enumID="I-Would" uiRep="I-Would" />
+								<lay:ListItem enumID="Reverse I-Would" uiRep="Reverse I-Would" />
+								<lay:ListItem enumID="Trailing Stop" uiRep="Trailing Stop" />
+							</lay:Control>
+						</lay:StrategyPanel>
+						<!-- END Trigger Drop-Down -->
+
+						<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+							<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" title="Contingent / Economic Indicator Triggers">
+								<!-- START CT Symbol -->
+								<lay:Control xsi:type="lay:TextField_t" ID="TriggerSymbol" label="Product" parameterRef="Trigger_ContingentTriggerSymbol" tooltip="Contingent trigger product that can be provided in Reuters RIC (.FTSE) or Bloomberg (UKX Index) notation.">
+									<flow:StateRule enabled="true">
+										<val:Edit field="TriggerCommands" operator="EQ" value="Contingent Trigger" />
+									</flow:StateRule>
+									<flow:StateRule enabled="false" value="{NULL}">
+										<val:Edit field="TriggerCommands" operator="NE" value="Contingent Trigger" />
+									</flow:StateRule>
+								</lay:Control>
+								<!-- END CT Symbol -->
+								<!-- START CT Conditional Operator -->
+								<lay:Control xsi:type="lay:DropDownList_t" ID="ConditionalOperator" label="Condition" parameterRef="Trigger_ConditionalOperator" tooltip="Conditional operator used for 'Contingent Trigger' and 'Economic Release' (NFP, IJC) commands.">
+									<lay:ListItem enumID="Greater Than" uiRep="&gt;" />
+									<lay:ListItem enumID="Less Than" uiRep="&lt;" />
+									<lay:ListItem enumID="Equals" uiRep="=" />
+									<lay:ListItem enumID="Greater Than or Equal" uiRep="&gt;=" />
+									<lay:ListItem enumID="Less Than or Equal" uiRep="&lt;=" />
+									<flow:StateRule enabled="true">
+										<val:Edit logicOperator="OR">
+											<val:Edit field="TriggerCommands" operator="EQ" value="Contingent Trigger" />
+											<val:Edit field="TriggerCommands" operator="EQ" value="Non Farm Payroll" />
+											<val:Edit field="TriggerCommands" operator="EQ" value="Initial Jobless Claims" />
+										</val:Edit>
+									</flow:StateRule>
+									<flow:StateRule enabled="false" value="{NULL}">
+										<val:Edit logicOperator="AND">
+											<val:Edit field="TriggerCommands" operator="NE" value="Contingent Trigger" />
+											<val:Edit field="TriggerCommands" operator="NE" value="Non Farm Payroll" />
+											<val:Edit field="TriggerCommands" operator="NE" value="Initial Jobless Claims" />
+										</val:Edit>
+									</flow:StateRule>
+								</lay:Control>
+								<!-- END CT Conditional Operator -->
+								<!-- START CT Price -->
+								<lay:Control xsi:type="lay:TextField_t" ID="TriggerPrice" label="Price" parameterRef="Trigger_ContingentTriggerPrice" tooltip="Price level relating to the 'Contingent Trigger' product specified.">
+									<flow:StateRule enabled="true">
+										<val:Edit field="TriggerCommands" operator="EQ" value="Contingent Trigger" />
+									</flow:StateRule>
+									<flow:StateRule enabled="false" value="{NULL}">
+										<val:Edit field="TriggerCommands" operator="NE" value="Contingent Trigger" />
+									</flow:StateRule>
+								</lay:Control>
+								<!-- END CT Price -->
+								<!-- START Economic Release Level -->
+								<lay:Control xsi:type="lay:TextField_t" ID="EconomicRelease" label="Econ Lvl" parameterRef="Trigger_EconomicReleaseLevel" tooltip="Economic indicator release level (expressed in multiples of 1,000).">
+									<flow:StateRule enabled="true">
+										<val:Edit logicOperator="OR">
+											<val:Edit field="TriggerCommands" operator="EQ" value="Non Farm Payroll" />
+											<val:Edit field="TriggerCommands" operator="EQ" value="Initial Jobless Claims" />
+										</val:Edit>
+									</flow:StateRule>
+									<flow:StateRule enabled="false" value="{NULL}">
+										<val:Edit logicOperator="AND">
+											<val:Edit field="TriggerCommands" operator="NE" value="Non Farm Payroll" />
+											<val:Edit field="TriggerCommands" operator="NE" value="Initial Jobless Claims" />
+										</val:Edit>
+									</flow:StateRule>
+								</lay:Control>
+								<!-- END Economic Release Level -->
+							</lay:StrategyPanel>
+						</lay:StrategyPanel>
+
+						<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+							<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" title="I-Would Triggers">
+								<!-- START I-Would Price -->
+								<lay:Control xsi:type="lay:SingleSpinner_t" ID="I-Would" label="Price" parameterRef="Trigger_IWouldPrice" tooltip="I-Would price to be used with the 'I-Would' and 'Reverse I-Would' commands.">
+									<flow:StateRule enabled="true">
+										<val:Edit logicOperator="OR">
+											<val:Edit field="TriggerCommands" operator="EQ" value="I-Would" />
+											<val:Edit field="TriggerCommands" operator="EQ" value="Reverse I-Would" />
+										</val:Edit>
+									</flow:StateRule>
+									<flow:StateRule enabled="false" value="{NULL}">
+										<val:Edit logicOperator="AND">
+											<val:Edit field="TriggerCommands" operator="NE" value="I-Would" />
+											<val:Edit field="TriggerCommands" operator="NE" value="Reverse I-Would" />
+										</val:Edit>
+									</flow:StateRule>
+								</lay:Control>
+								<!-- END I-Would Price -->
+							</lay:StrategyPanel>
+							<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" title="Basket Triggers">
+								<!-- START Basket Constituent ID -->
+								<lay:Control xsi:type="lay:DropDownList_t" ID="BasketConstituent" label="Item" parameterRef="Trigger_BasketConstituent" tooltip="Basket constituent identifier (1, 2 or 3), used for OCO, IFD and IFD/OCO basket orders.">
+									<lay:ListItem enumID="BasketID_1" uiRep="1" />
+									<lay:ListItem enumID="BasketID_2" uiRep="2" />
+									<lay:ListItem enumID="BasketID_3" uiRep="3" />
+									<flow:StateRule enabled="true">
+										<val:Edit logicOperator="OR">
+											<val:Edit field="TriggerCommands" operator="EQ" value="If Done" />
+											<val:Edit field="TriggerCommands" operator="EQ" value="If Done / One Cancels Other" />
+											<val:Edit field="TriggerCommands" operator="EQ" value="One Cancels Other" />
+										</val:Edit>
+									</flow:StateRule>
+									<flow:StateRule enabled="false" value="{NULL}">
+										<val:Edit logicOperator="AND">
+											<val:Edit field="TriggerCommands" operator="NE" value="If Done" />
+											<val:Edit field="TriggerCommands" operator="NE" value="If Done / One Cancels Other" />
+											<val:Edit field="TriggerCommands" operator="NE" value="One Cancels Other" />
+										</val:Edit>
+									</flow:StateRule>
+								</lay:Control>
+								<!-- END Basket Constituent ID -->
+							</lay:StrategyPanel>
+						</lay:StrategyPanel>
+
+						<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+							<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" title="Trailing Stop">
+								<!-- START Trailing Stop Reference Price -->
+								<lay:Control xsi:type="lay:TextField_t" ID="TrailingStopRefPx" label="Price" parameterRef="Trigger_TrailingStopRefPx" tooltip="The 'Trailing Stop Price' is the market level at which a long/short position was previously entered.">
+									<flow:StateRule enabled="true">
+										<val:Edit logicOperator="AND">
+											<val:Edit field="TriggerCommands" operator="EQ" value="Trailing Stop" />
+											<val:Edit field="OrderType" operator="EQ" value="Stop" />
+										</val:Edit>
+									</flow:StateRule>
+									<flow:StateRule enabled="false" value="{NULL}">
+										<val:Edit logicOperator="OR">
+											<val:Edit field="TriggerCommands" operator="NE" value="Trailing Stop" />
+											<val:Edit field="OrderType" operator="NE" value="Stop" />
+										</val:Edit>
+									</flow:StateRule>
+								</lay:Control>
+								<!-- END Trailing Stop Reference Price -->
+								<!-- START Trailing Stop Step Level -->
+								<lay:Control xsi:type="lay:SingleSpinner_t" ID="TrailingStopStep" label="Step" parameterRef="Trigger_TrailingStopStep" increment="10" tooltip="The 'Trailing Stop Step' is the incremental value (pips) by which the 'Stop Rate' will be adjusted in favourable market conditions.">
+									<flow:StateRule enabled="true">
+										<val:Edit logicOperator="AND">
+											<val:Edit field="TriggerCommands" operator="EQ" value="Trailing Stop" />
+											<val:Edit field="OrderType" operator="EQ" value="Stop" />
+										</val:Edit>
+									</flow:StateRule>
+									<flow:StateRule enabled="false" value="{NULL}">
+										<val:Edit logicOperator="OR">
+											<val:Edit field="TriggerCommands" operator="NE" value="Trailing Stop" />
+											<val:Edit field="OrderType" operator="NE" value="Stop" />
+										</val:Edit>
+									</flow:StateRule>
+								</lay:Control>
+								<!-- END Trailing Stop Step Level -->
+							</lay:StrategyPanel>
+						</lay:StrategyPanel>
+					</lay:StrategyPanel>
+					<!-- END Trigger -->
+					<!-- END 3rd row -->
+				</lay:StrategyPanel>
+				<!-- END ADVANCED PARAMETERS -->
+			</lay:StrategyPanel>
+		</lay:StrategyLayout>
+		<!--- END GUI LAYOUT -->
+
+		<!-- START INPUT VALIDATION -->
+		<val:StrategyEdit errorMessage="'End Time' must be later than 'Start Time'">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="EndTime" operator="NX" />
+				<val:Edit field="StartTime" operator="NX" />
+				<val:Edit field="EndTime" operator="GT" field2="StartTime" />
+			</val:Edit>
+		</val:StrategyEdit>
+		<val:StrategyEdit errorMessage="'Maximum Volume %' must be greater than 'Minimum Volume %'">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="MaxPctVolume" operator="NX" />
+				<val:Edit field="MinPctVolume" operator="NX" />
+				<val:Edit field="MaxPctVolume" operator="GE" field2="MinPctVolume" />
+			</val:Edit>
+		</val:StrategyEdit>
+		<val:StrategyEdit errorMessage="A positive 'Limit Rate' value is required for 'Limit' orders.">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="OrdType" operator="NE" value="2" />
+				<val:Edit logicOperator="AND">
+					<val:Edit field="OrdType" operator="EQ" value="2" />
+					<val:Edit field="Price" operator="GT" value="0" />
+				</val:Edit>
+			</val:Edit>
+		</val:StrategyEdit>
+		<val:StrategyEdit errorMessage="A positive 'Stop Rate' value is required for 'Stop' orders.">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="OrdType" operator="NE" value="3" />
+				<val:Edit logicOperator="AND">
+					<val:Edit field="OrdType" operator="EQ" value="3" />
+					<val:Edit field="StopPx" operator="GT" value="0" />
+				</val:Edit>
+			</val:Edit>
+		</val:StrategyEdit>
+		<val:StrategyEdit errorMessage="A positive 'Limit Rate' value is required for 'Stop Limit' orders.">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="OrdType" operator="NE" value="4" />
+				<val:Edit logicOperator="AND">
+					<val:Edit field="OrdType" operator="EQ" value="4" />
+					<val:Edit field="Price" operator="GT" value="0" />
+				</val:Edit>
+			</val:Edit>
+		</val:StrategyEdit>
+		<val:StrategyEdit errorMessage="A positive 'Stop Rate' value is required for 'Stop Limit' orders.">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="OrdType" operator="NE" value="4" />
+				<val:Edit logicOperator="AND">
+					<val:Edit field="OrdType" operator="EQ" value="4" />
+					<val:Edit field="StopPx" operator="GT" value="0" />
+				</val:Edit>
+			</val:Edit>
+		</val:StrategyEdit>
+		<val:StrategyEdit errorMessage="'IFD' baskets can only contain 2 basket items.">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="Trigger_TriggerType" operator="NE" value="IFD" />
+				<val:Edit logicOperator="AND">
+					<val:Edit field="Trigger_TriggerType" operator="EQ" value="IFD" />
+					<val:Edit field="Trigger_BasketConstituent" operator="LT" value="3" />
+				</val:Edit>
+			</val:Edit>
+		</val:StrategyEdit>
+		<val:StrategyEdit errorMessage="'OCO' baskets can only contain 2 basket items.">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="Trigger_TriggerType" operator="NE" value="OCO" />
+				<val:Edit logicOperator="AND">
+					<val:Edit field="Trigger_TriggerType" operator="EQ" value="OCO" />
+					<val:Edit field="Trigger_BasketConstituent" operator="LT" value="3" />
+				</val:Edit>
+			</val:Edit>
+		</val:StrategyEdit>
+		<val:StrategyEdit errorMessage="A positive 'I-Would' value is required for 'I-Would' Triggers.">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="Trigger_TriggerType" operator="NE" value="IW" />
+				<val:Edit logicOperator="AND">
+					<val:Edit field="Trigger_TriggerType" operator="EQ" value="IW" />
+					<val:Edit field="Trigger_IWouldPrice" operator="GT" value="0" />
+				</val:Edit>
+			</val:Edit>
+		</val:StrategyEdit>
+		<val:StrategyEdit errorMessage="A positive 'I-Would' value is required for 'Reverse I-Would' Triggers.">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="Trigger_TriggerType" operator="NE" value="RIW" />
+				<val:Edit logicOperator="AND">
+					<val:Edit field="Trigger_TriggerType" operator="EQ" value="RIW" />
+					<val:Edit field="Trigger_IWouldPrice" operator="GT" value="0" />
+				</val:Edit>
+			</val:Edit>
+		</val:StrategyEdit>
+		<val:StrategyEdit errorMessage="A positive 'Trailing Stop Reference Price' value is required for 'Trailing Stop' Triggers.">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="Trigger_TriggerType" operator="NE" value="TRAIL" />
+				<val:Edit logicOperator="AND">
+					<val:Edit field="Trigger_TriggerType" operator="EQ" value="TRAIL" />
+					<val:Edit field="Trigger_TrailingStopRefPx" operator="GT" value="0" />
+				</val:Edit>
+			</val:Edit>
+		</val:StrategyEdit>
+		<val:StrategyEdit errorMessage="A positive 'Trailing Stop Step' value is required for 'Trailing Stop' Triggers.">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="Trigger_TriggerType" operator="NE" value="TRAIL" />
+				<val:Edit logicOperator="AND">
+					<val:Edit field="Trigger_TriggerType" operator="EQ" value="TRAIL" />
+					<val:Edit field="Trigger_TrailingStopStep" operator="GT" value="0" />
+				</val:Edit>
+			</val:Edit>
+		</val:StrategyEdit>
+		<!-- END INPUT VALIDATION -->
+	</Strategy>
+	<!-- **** FLOAT GUERRILLA **** -->
+</Strategies>

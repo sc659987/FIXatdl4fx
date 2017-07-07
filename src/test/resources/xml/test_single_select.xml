@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core fixatdl-core-1-1.xsd"
+            strategyIdentifierTag="7620"
+            versionIdentifierTag="7621">
+	 <Strategy name="Tazer1" uiRep="Tazer" wireValue="Tazer" version="1" fixMsgType="D" providerID="ABC">
+	 	<Parameter name="StartTime" xsi:type="UTCTimestamp_t" fixTag="7602" use="required" />
+
+		<Parameter name="ExecutionStyle" xsi:type="Int_t" fixTag="9999" use="required">
+            <EnumPair enumID="Very Passive"    wireValue="1"/>
+            <EnumPair enumID="Passive"         wireValue="2"/>
+            <EnumPair enumID="Neutral"         wireValue="3"/>
+            <EnumPair enumID="Aggressive"      wireValue="4"/>
+            <EnumPair enumID="Very Aggressive" wireValue="5"/>
+        </Parameter>
+
+ 		<lay:StrategyLayout>
+        	<lay:StrategyPanel orientation="VERTICAL">
+				<lay:Control ID="DQHandling" xsi:type="lay:MultiSelectList_t" label="Display Handling" parameterRef="ExecutionStyle">
+                  <lay:ListItem enumID="Very Passive" uiRep="Very Passive" />
+                  <lay:ListItem enumID="Passive" uiRep="Passive" />
+                  <lay:ListItem enumID="Neutral" uiRep="Neutral" />
+                  <lay:ListItem enumID="Aggressive" uiRep="Aggressive" />
+                  <lay:ListItem enumID="Very Aggressive" uiRep="Very Aggressives" />
+                </lay:Control>
+             </lay:StrategyPanel>
+         </lay:StrategyLayout>
+     </Strategy>
+</Strategies>

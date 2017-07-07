@@ -1,0 +1,83 @@
+<Strategies xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation"
+            xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+            xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            imageLocation="/images/banner.gif"
+            strategyIdentifierTag="847"
+            versionIdentifierTag="9682">
+
+
+  <Strategy name="Access" uiRep="Access" wireValue="1012" providerID="BAML" version="BAML v9.7.6.3">
+    <Description>&lt;html&gt;&lt;div style=&quot;width:350px;&quot;&gt;Wait passively in any market until the right
+      opportunities arise. You can select the specific pool of liquidity or let the algorithm distribute the order
+      intelligently across the liquidity pools.
+    </Description>
+
+    <Parameter name="LimitPrice" xsi:type="Price_t" fixTag="44" use="required"/>
+    <Parameter name="TimeInForce" xsi:type="Char_t" fixTag="59" use="required">
+      <EnumPair enumID="Day" wireValue="0"/>
+      <EnumPair enumID="GTD" wireValue="6"/>
+    </Parameter>
+    <Parameter name="ExpireTime" xsi:type="UTCTimestamp_t" fixTag="126" use="optional">
+      <Description>End order at selected time</Description>
+    </Parameter>
+
+    <Parameter name="ExposedPercent" xsi:type="Amt_t" fixTag="9018" constValue="100"/>
+
+    <Parameter name="IncludeExchanges" use="required" fixTag="9005" xsi:type="String_t">
+      <EnumPair wireValue="PRIMARY" enumID="PRIMARY"/>
+      <EnumPair wireValue="A" enumID="A"/>
+      <EnumPair wireValue="C" enumID="C"/>
+      <EnumPair wireValue="D" enumID="D"/>
+      <EnumPair wireValue="E" enumID="E"/>
+      <EnumPair wireValue="H" enumID="H"/>
+    </Parameter>
+
+    <lay:StrategyLayout>
+      <lay:StrategyPanel collapsible="false" orientation="VERTICAL">
+
+        <lay:StrategyPanel title="Strategy Parameters" collapsible="false" orientation="VERTICAL">
+          <lay:Control ID="c_LimitPrice" xsi:type="lay:TextField_t" label="Limit Price" parameterRef="LimitPrice"
+                       tooltip="Will trade up to, but not beyond, your limit price"/>
+
+          <lay:Control xsi:type="lay:DropDownList_t" initValue="PRIMARY"
+                       tooltip="&lt;html&gt;&lt;div style=&quot;width:250px;&quot;&gt;Allows you to select where the order routes. Choosing “Intelligent” allows the algorithm to route to the trading venues with the highest probability of execution at the best price"
+                       parameterRef="IncludeExchanges" label="Liquidity" ID="c_IncludeExchanges">
+            <lay:ListItem enumID="PRIMARY" uiRep="Primary"/>
+            <lay:ListItem enumID="E" uiRep="EBS"/>
+            <lay:ListItem enumID="D" uiRep="D3K (Reuters)"/>
+            <lay:ListItem enumID="H" uiRep="Hotspot"/>
+            <lay:ListItem enumID="C" uiRep="Currenex"/>
+            <lay:ListItem enumID="A" uiRep="FXAll"/>
+          </lay:Control>
+        </lay:StrategyPanel>
+
+
+        <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="End">
+          <lay:Control ID="c_TimeInForce" xsi:type="lay:RadioButtonList_t" parameterRef="TimeInForce" initValue="Day" orientation="VERTICAL">
+            <lay:ListItem uiRep="Day" enumID="Day"/>
+            <lay:ListItem uiRep="Good Until" enumID="GTD"/>
+          </lay:Control>
+
+          <lay:Control ID="c_ExpireTime" xsi:type="lay:Clock_t" label="" parameterRef="ExpireTime">
+            <flow:StateRule enabled="false" value="{NULL}">
+              <val:Edit field="c_TimeInForce" operator="NE" value="GTD"/>
+            </flow:StateRule>
+          </lay:Control>
+
+          <lay:Control ID="c_MultidayNotSupported" xsi:type="lay:Label_t"
+                       initValue="* Multi-day orders are not supported.">
+            <flow:StateRule visible="false">
+              <val:Edit field="c_TimeInForce" operator="EQ" value="Day"/>
+            </flow:StateRule>
+          </lay:Control>
+        </lay:StrategyPanel>
+
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+  </Strategy>
+</Strategies>
+
+

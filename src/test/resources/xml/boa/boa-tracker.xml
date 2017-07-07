@@ -1,0 +1,142 @@
+<Strategies xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation"
+            xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+            xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            imageLocation="/images/banner.gif"
+            strategyIdentifierTag="847"
+            versionIdentifierTag="9682">
+
+    <Strategy name="Tracker" uiRep="Tracker" wireValue="1007" providerID="BAML" version="BAML v9.7.6.3">
+        <Description>&lt;html&gt;&lt;div style=&quot;width:350px;&quot;&gt;Places Iceberg orders in the selected market
+            and moves the orders automatically when the market moves. You can specify to join, improve (tighten) or sit
+            behind top of the book. It has built-in anti-gaming logic to avoid chasing sniffer orders or to prevent
+            being detected.
+        </Description>
+
+        <Parameter name="LimitPrice" xsi:type="Price_t" fixTag="44" use="optional"/>
+
+        <Parameter name="TimeInForce" xsi:type="Char_t" fixTag="59" use="required">
+            <EnumPair enumID="Day" wireValue="0"/>
+            <EnumPair enumID="GTD" wireValue="6"/>
+        </Parameter>
+
+        <Parameter name="ExpireTime" xsi:type="UTCTimestamp_t" fixTag="126" use="optional">
+            <Description>End order at selected time</Description>
+        </Parameter>
+
+        <Parameter name="ExposedPercent" xsi:type="Int_t" fixTag="9018" minValue="0" maxValue="100" use="required"
+                   mutableOnCxlRpl="false"/>
+
+        <Parameter name="IncludeExchanges" use="required" fixTag="9005" xsi:type="String_t">
+            <EnumPair wireValue="PRIMARY" enumID="PRIMARY"/>
+            <EnumPair wireValue="B" enumID="B"/>
+            <EnumPair wireValue="D" enumID="D"/>
+            <EnumPair wireValue="E" enumID="E"/>
+            <EnumPair wireValue="H" enumID="H"/>
+        </Parameter>
+
+        <Parameter name="FollowExchange" use="required" fixTag="9007" xsi:type="String_t" mutableOnCxlRpl="false">
+            <EnumPair wireValue="PRIMARY" enumID="PRIMARY"/>
+            <EnumPair wireValue="B" enumID="B"/>
+            <EnumPair wireValue="D" enumID="D"/>
+            <EnumPair wireValue="E" enumID="E"/>
+            <EnumPair wireValue="H" enumID="H"/>
+        </Parameter>
+
+        <Parameter name="TicksImprove" xsi:type="Amt_t" fixTag="9008" use="required"/>
+        <Parameter name="StayTime" xsi:type="Int_t" fixTag="9009" use="optional" mutableOnCxlRpl="false" minValue="1"
+                   maxValue="10000"/>
+        <Parameter name="ReactionTime" xsi:type="Int_t" fixTag="9010" use="optional" mutableOnCxlRpl="false"
+                   minValue="1" maxValue="10000"/>
+        <Parameter name="ReplenishTime" xsi:type="Int_t" fixTag="9011" use="optional" mutableOnCxlRpl="false"
+                   minValue="1" maxValue="10000"/>
+        <Parameter name="TimeRandom" xsi:type="Int_t" fixTag="9012" use="optional" mutableOnCxlRpl="false" minValue="1"
+                   maxValue="10000"/>
+        <Parameter name="MinSeenSize" xsi:type="Amt_t" fixTag="9014" use="optional" mutableOnCxlRpl="false"/>
+        <Parameter name="MaxMove" xsi:type="Int_t" fixTag="9015" use="optional"/>
+
+        <lay:StrategyLayout>
+            <lay:StrategyPanel collapsible="false" orientation="VERTICAL">
+
+                <lay:StrategyPanel title="Strategy Parameters" collapsible="false" orientation="VERTICAL">
+
+                    <lay:Control xsi:type="lay:DropDownList_t" initValue="PRIMARY"
+                                 tooltip="&lt;html&gt;&lt;div style=&quot;width:250px;&quot;&gt;Allows you to select the trading venue where the order routes. Choosing “Primary” allows the algorithm to route the order for the highest probability of paid/given"
+                                 parameterRef="IncludeExchanges" label="Liquidity" ID="c_IncludeExchanges">
+                        <lay:ListItem enumID="PRIMARY" uiRep="Primary"/>
+                        <lay:ListItem enumID="E" uiRep="EBS"/>
+                        <lay:ListItem enumID="D" uiRep="D3K (Reuters)"/>
+                        <lay:ListItem enumID="H" uiRep="Hotspot"/>
+                        <lay:ListItem enumID="B" uiRep="Curex"/>
+                    </lay:Control>
+
+                    <lay:Control xsi:type="lay:DropDownList_t" initValue="PRIMARY"
+                                 tooltip="&lt;html&gt;&lt;div style=&quot;width:250px;&quot;&gt;Allows the order to be pegged based on the price movements of trading venue of your choice"
+                                 parameterRef="FollowExchange" label="Follow Exch" ID="c_FollowExchange">
+                        <lay:ListItem enumID="PRIMARY" uiRep="Primary"/>
+                        <lay:ListItem enumID="E" uiRep="EBS"/>
+                        <lay:ListItem enumID="D" uiRep="D3K (Reuters)"/>
+                        <lay:ListItem enumID="H" uiRep="Hotspot"/>
+                        <lay:ListItem enumID="B" uiRep="Curex"/>
+                    </lay:Control>
+
+                    <lay:Control ID="c_LimitPrice" xsi:type="lay:TextField_t" label="Limit Price"
+                                 parameterRef="LimitPrice"
+                                 tooltip="Will trade up to, but not beyond, your limit price"/>
+
+                    <lay:Control ID="c_MaxMove" xsi:type="lay:TextField_t" label="Max Move" parameterRef="MaxMove"
+                                 tooltip="&lt;html&gt;&lt;div style=&quot;width:250px;&quot;&gt;Maximum number of pips to follow the market against inception price. This will be translated into primary market precision by the algo automatically"/>
+
+                    <lay:Control ID="c_ExposedPercent" xsi:type="lay:SingleSpinner_t" increment="1"
+                                 tooltip="Percentage of the original order amount to expose"
+                                 parameterRef="ExposedPercent" orientation="HORIZONTAL" label="Exposed Percent"/>
+
+                    <lay:Control ID="c_TicksImprove" xsi:type="lay:TextField_t" label="Pips Adjust" initValue="0"
+                                 parameterRef="TicksImprove"
+                                 tooltip="The number of pips you want to be below/above the bid/offer"/>
+
+                    <lay:Control ID="c_StayTime" xsi:type="lay:TextField_t" label="Stay (ms)" initValue="100"
+                                 parameterRef="StayTime"
+                                 tooltip="Amount of time you stay alone at the top of book"/>
+                    <lay:Control ID="c_ReactionTime" xsi:type="lay:TextField_t" label="Reaction (ms)" initValue="300"
+                                 parameterRef="ReactionTime"
+                                 tooltip="Amount of time you wait in reaction to a change in the market price"/>
+                    <lay:Control ID="c_ReplenishTime" xsi:type="lay:TextField_t" label="Replenish (ms)" initValue="200"
+                                 parameterRef="ReplenishTime"
+                                 tooltip="How long before you re-enter the market after being paid/given"/>
+                    <lay:Control ID="c_TimeRandom" xsi:type="lay:TextField_t" label="Random (ms)" initValue="100"
+                                 parameterRef="TimeRandom"
+                                 tooltip="Randomizes stay, reaction and replenish times to avoid external gaming"/>
+                    <lay:Control ID="c_MinSeenSize" xsi:type="lay:TextField_t" label="Min Size"
+                                 parameterRef="MinSeenSize"
+                                 tooltip="&lt;html&gt;&lt;div style=&quot;width:250px;&quot;&gt;Minimum size that must exist in the best bid (offer) in the FollowExchange before a re-peg is triggered"/>
+                </lay:StrategyPanel>
+
+
+                <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="Good Until">
+                    <lay:Control ID="c_TimeInForce" xsi:type="lay:RadioButtonList_t" parameterRef="TimeInForce"
+                                 initValue="Day" orientation="VERTICAL">
+                        <lay:ListItem uiRep="Day" enumID="Day"/>
+                        <lay:ListItem uiRep="Good Until" enumID="GTD"/>
+                    </lay:Control>
+
+                    <lay:Control ID="c_ExpireTime" xsi:type="lay:Clock_t" label="" parameterRef="ExpireTime">
+                        <flow:StateRule enabled="false" value="{NULL}">
+                            <val:Edit field="c_TimeInForce" operator="NE" value="GTD"/>
+                        </flow:StateRule>
+                    </lay:Control>
+
+                    <lay:Control ID="c_MultidayNotSupported" xsi:type="lay:Label_t"
+                                 initValue="* Multi-day orders are not supported.">
+                        <flow:StateRule visible="false">
+                            <val:Edit field="c_TimeInForce" operator="EQ" value="Day"/>
+                        </flow:StateRule>
+                    </lay:Control>
+                </lay:StrategyPanel>
+
+            </lay:StrategyPanel>
+        </lay:StrategyLayout>
+    </Strategy>
+</Strategies>

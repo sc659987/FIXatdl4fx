@@ -1,0 +1,291 @@
+<!-- ************************* -->
+<!-- ***** PowerFill TWAP **** -->
+<!-- *** (TWAP v2 in Spec) *** -->
+<!-- ************************* -->
+
+<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core" xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation" xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout" xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core" strategyIdentifierTag="847" versionIdentifierTag="958">
+
+	<Strategy name="PowerFillTWAP" uiRep="PowerFill TWAP" wireValue="1012" providerID="">
+
+		<!-- Common parameters -->
+		<Parameter name="startTime" xsi:type="UTCTimestamp_t" use="optional" />
+		<Parameter name="endTime" xsi:type="UTCTimestamp_t" use="optional" />
+
+		<!-- TWAPv2 parameters -->
+		<Parameter name="behaviour" xsi:type="String_t" use="required">
+			<EnumPair enumID="e_SpeedUpAndFill" wireValue="SpeedUpAndFill" />
+			<EnumPair enumID="e_SpeedUpAndCancel" wireValue="SpeedUpAndCancel" />
+			<EnumPair enumID="e_SpeedUpAndExtend" wireValue="SpeedUpAndExtend" />
+			<EnumPair enumID="e_ConstantSpeedAndExtend" wireValue="ConstantSpeedAndExtend" />
+		</Parameter>
+		<Parameter name="targetEndTime" xsi:type="UTCTimestamp_t" use="optional" />
+		<Parameter name="_360t_useDuration" xsi:type="Boolean_t" use="optional" />
+		<Parameter name="durationD" xsi:type="Int_t" use="optional" minValue="0" />
+		<Parameter name="durationH" xsi:type="Int_t" use="optional" minValue="0" />
+		<Parameter name="durationM" xsi:type="Int_t" use="optional" minValue="0" />
+		<Parameter name="timeIntervalH" xsi:type="Int_t" use="optional" minValue="0" />
+		<Parameter name="timeIntervalM" xsi:type="Int_t" use="optional" minValue="0" />
+		<Parameter name="timeIntervalS" xsi:type="Int_t" use="optional" minValue="0" />
+		<Parameter name="clipSize" xsi:type="Amt_t" use="optional" minValue="0" />
+		<Parameter name="level" xsi:type="Price_t" use="optional" />
+		<Parameter name="stopLevel" xsi:type="Price_t" use="optional" />
+		<Parameter name="atStopLevelBehaviour" xsi:type="String_t" use="optional">
+			<EnumPair enumID="e_NotSet" wireValue="{NULL}" />
+			<EnumPair enumID="e_Cancel" wireValue="Cancel" />
+			<EnumPair enumID="e_Fill" wireValue="Fill" />
+		</Parameter>
+
+		<lay:StrategyLayout>
+
+			<lay:StrategyPanel title="Strategy Parameters" collapsible="false" orientation="VERTICAL">
+
+				<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+					<lay:StrategyPanel title="Description" collapsible="false" orientation="VERTICAL">
+						<lay:Control ID="DescriptionL1" xsi:type="lay:Label_t" label="Orders that will pace execution, splitting the order into even slices which are executed at regular" />
+						<lay:Control ID="DescriptionL2" xsi:type="lay:Label_t" label="intervals until the order is filled. Specify clip interval and total time to reduce market impact" />
+						<lay:Control ID="DescriptionL3" xsi:type="lay:Label_t" label="on block orders. Delay the start time and set a narrow window to create a synthetic Benchmark." />
+						<lay:Control ID="DescriptionL4" xsi:type="lay:Label_t" label=" " />
+						<lay:Control ID="DescriptionL5" xsi:type="lay:Label_t" label="TWAP With Levels: Set an upper boundary for a buy order or lower boundary for a sell order." />
+					</lay:StrategyPanel>
+				</lay:StrategyPanel>
+
+				<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+					<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+
+						<lay:StrategyPanel title="Common Parameters" collapsible="false" orientation="VERTICAL">
+							<!-- Start time -->
+							<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" title="Start Time">
+								<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+									<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+										<lay:Control ID="c_NoStartTime" xsi:type="lay:RadioButton_t" label="Now" initValue="true" radioGroup="StartTimeRB" />
+									</lay:StrategyPanel>
+								</lay:StrategyPanel>
+								<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+									<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+										<lay:Control ID="c_EnableStartTime" xsi:type="lay:RadioButton_t" radioGroup="StartTimeRB" />
+									</lay:StrategyPanel>
+									<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+										<lay:Control ID="c_StartTime" xsi:type="lay:Clock_t" parameterRef="startTime">
+											<flow:StateRule enabled="false" value="{NULL}">
+												<val:Edit field="c_EnableStartTime" operator="EQ" value="false" />
+											</flow:StateRule>
+										</lay:Control>
+									</lay:StrategyPanel>
+								</lay:StrategyPanel>
+							</lay:StrategyPanel>
+
+							<!-- End time -->
+							<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" title="End Time">
+								<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+									<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+										<lay:Control ID="c_EndTime" xsi:type="lay:Clock_t" parameterRef="endTime" label="                  " initValueMode="1" initValue="16:59:00" localMktTz="America/New_York" />
+									</lay:StrategyPanel>
+								</lay:StrategyPanel>
+							</lay:StrategyPanel>
+
+						</lay:StrategyPanel>
+
+						<lay:StrategyPanel title="TWAP Parameters" collapsible="false" orientation="VERTICAL">
+							<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+								<lay:Control ID="c_Behaviour" xsi:type="lay:DropDownList_t" label="If Delayed" initValue="e_SpeedUpAndExtend" parameterRef="behaviour" tooltip="&lt;html&gt;Different options in allowing TWAP to speed-up&lt;br/&gt;and extend-out if clip execution is delayed&lt;/html&gt;">
+									<lay:ListItem enumID="e_SpeedUpAndFill" uiRep="SpeedUpAndFill" />
+									<lay:ListItem enumID="e_SpeedUpAndCancel" uiRep="SpeedUpAndCancel" />
+									<lay:ListItem enumID="e_SpeedUpAndExtend" uiRep="SpeedUpAndExtend" />
+									<lay:ListItem enumID="e_ConstantSpeedAndExtend" uiRep="ConstantSpeed" />
+								</lay:Control>
+								<lay:Control ID="c_ClipSize" xsi:type="lay:SingleSpinner_t" label="Clip size" initValue="25000" incrementPolicy="lotSize" increment="1000" parameterRef="clipSize" tooltip="&lt;html&gt;The amount in this field is in notional currency.&lt;br/&gt;Minimum clip size is the equivalent of 25000 USD.&lt;br/&gt;Clip sizes above 1 million must be increments of 1 million.&lt;/html&gt;"/>
+							</lay:StrategyPanel>
+
+							<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" title="Duration (HH:MM)">
+								<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+									<lay:Control ID="c_UseDuration" xsi:type="lay:RadioButton_t" initValue="false" radioGroup="TargetEndTimeOrDuration" parameterRef="_360t_useDuration">
+										<flow:StateRule enabled="false" value="{NULL}">
+											<val:Edit field="c_Behaviour" operator="EQ" value="e_ConstantSpeedAndExtend" />
+										</flow:StateRule>
+									</lay:Control>
+								</lay:StrategyPanel>
+								<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+									<lay:Control ID="c_DurationH" xsi:type="lay:SingleSpinner_t" parameterRef="durationH" increment="1" initValue="0">
+										<flow:StateRule enabled="false" value="{NULL}">
+											<val:Edit logicOperator="OR">
+												<val:Edit field="c_Behaviour" operator="EQ" value="e_ConstantSpeedAndExtend" />
+												<val:Edit field="c_UseDuration" operator="NE" value="true" />
+											</val:Edit>
+										</flow:StateRule>
+									</lay:Control>
+								</lay:StrategyPanel>
+								<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+									<lay:Control ID="c_DurationM" xsi:type="lay:SingleSpinner_t" label=":" parameterRef="durationM" increment="1" initValue="0">
+										<flow:StateRule enabled="false" value="{NULL}">
+											<val:Edit logicOperator="OR">
+												<val:Edit field="c_Behaviour" operator="EQ" value="e_ConstantSpeedAndExtend" />
+												<val:Edit field="c_UseDuration" operator="NE" value="true" />
+											</val:Edit>
+										</flow:StateRule>
+									</lay:Control>
+								</lay:StrategyPanel>
+							</lay:StrategyPanel>
+
+							<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" title="Target End Time">
+								<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+									<lay:Control ID="c_UseTargetEndTime" xsi:type="lay:RadioButton_t" initValue="true" radioGroup="TargetEndTimeOrDuration">
+										<flow:StateRule enabled="false" value="{NULL}">
+											<val:Edit field="c_Behaviour" operator="EQ" value="e_ConstantSpeedAndExtend" />
+										</flow:StateRule>
+									</lay:Control>
+								</lay:StrategyPanel>
+								<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+									<lay:Control ID="c_targetEndTime" xsi:type="lay:Clock_t" parameterRef="targetEndTime" tooltip="Seconds will be ignored" initValueMode="1" initValue="16:58:00" localMktTz="America/New_York">
+										<flow:StateRule enabled="false" value="{NULL}">
+											<val:Edit logicOperator="OR">
+												<val:Edit field="c_Behaviour" operator="EQ" value="e_ConstantSpeedAndExtend" />
+												<val:Edit field="c_UseTargetEndTime" operator="NE" value="true" />
+											</val:Edit>
+										</flow:StateRule>
+									</lay:Control>
+								</lay:StrategyPanel>
+							</lay:StrategyPanel>
+
+							<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" title="Price Level">
+								<lay:Control ID="c_EnableLevel" xsi:type="lay:CheckBox_t" initValue="false" />
+								<lay:Control ID="c_Level" xsi:type="lay:TextField_t" parameterRef="level"
+									tooltip="&lt;html&gt;This level controls when orders are placed in the market.&lt;br/&gt;TWAP will only place orders in the market when the price is&lt;br/&gt;below this level if buying or above this level if selling.&lt;br/&gt;For example, use the &#x2018;Sell Above&#x2019; to put in a Limit Price,&lt;br/&gt;which will pause the sell order every time it goes below&lt;br/&gt;your specified limit price.&lt;/html&gt;">
+									<flow:StateRule enabled="false" value="{NULL}">
+										<val:Edit field="c_EnableLevel" operator="EQ" value="false" />
+									</flow:StateRule>
+								</lay:Control>
+							</lay:StrategyPanel>
+
+							<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" title="Time Interval (HH:MM)">
+								<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+									<lay:Control ID="c_TimeIntervalH" xsi:type="lay:SingleSpinner_t" parameterRef="timeIntervalH" increment="1" initValue="0">
+										<flow:StateRule enabled="false" value="{NULL}">
+											<val:Edit field="c_Behaviour" operator="NE" value="e_ConstantSpeedAndExtend" />
+										</flow:StateRule>
+									</lay:Control>
+								</lay:StrategyPanel>
+								<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+									<lay:Control ID="c_TimeIntervalM" xsi:type="lay:SingleSpinner_t" label=":" parameterRef="timeIntervalM" increment="1" initValue="0">
+										<flow:StateRule enabled="false" value="{NULL}">
+											<val:Edit field="c_Behaviour" operator="NE" value="e_ConstantSpeedAndExtend" />
+										</flow:StateRule>
+									</lay:Control>
+								</lay:StrategyPanel>
+								<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+									<lay:Control ID="c_TimeIntervalS" xsi:type="lay:SingleSpinner_t" label=":" parameterRef="timeIntervalS" increment="1" initValue="0">
+										<flow:StateRule enabled="false" value="{NULL}">
+											<val:Edit field="c_Behaviour" operator="NE" value="e_ConstantSpeedAndExtend" />
+										</flow:StateRule>
+									</lay:Control>
+								</lay:StrategyPanel>
+							</lay:StrategyPanel>
+
+							<lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="Stop Level">
+								<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+									<lay:Control ID="c_EnableStopLevel" xsi:type="lay:CheckBox_t" initValue="false" />
+									<lay:Control ID="c_StopLevel" xsi:type="lay:TextField_t" parameterRef="stopLevel"
+										tooltip="&lt;html&gt;An optional fixed price level which, if reached&lt;br/&gt;(triggered on trailing bid/offer), will terminate the&lt;br/&gt;order either by filling the remaining portion of the&lt;br/&gt;order immediately using the Flex (Very Fast) algo or&lt;br/&gt;by just cancelling the order, partially filled.&lt;/html&gt;">
+										<flow:StateRule enabled="false" value="{NULL}">
+											<val:Edit field="c_EnableStopLevel" operator="EQ" value="false" />
+										</flow:StateRule>
+									</lay:Control>
+								</lay:StrategyPanel>
+								<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+									<lay:Control ID="c_StopBehaviour" xsi:type="lay:DropDownList_t" label="Behaviour" parameterRef="atStopLevelBehaviour">
+										<lay:ListItem enumID="e_NotSet" uiRep="" />
+										<lay:ListItem enumID="e_Cancel" uiRep="Cancel" />
+										<lay:ListItem enumID="e_Fill" uiRep="Fill" />
+										<flow:StateRule enabled="false" value="{NULL}">
+											<val:Edit field="c_EnableStopLevel" operator="EQ" value="false" />
+										</flow:StateRule>
+									</lay:Control>
+								</lay:StrategyPanel>
+							</lay:StrategyPanel>
+						</lay:StrategyPanel>
+					</lay:StrategyPanel>
+				</lay:StrategyPanel>
+			</lay:StrategyPanel>
+		</lay:StrategyLayout>
+
+		<!-- **************************** -->
+		<!-- Common parameter constraints -->
+		<!-- **************************** -->
+		<val:StrategyEdit errorMessage="Start Time must precede End Time.">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="startTime" operator="NX" />
+				<val:Edit field="endTime" operator="NX" />
+				<val:Edit field="startTime" operator="LT" field2="endTime" />
+			</val:Edit>
+		</val:StrategyEdit>
+
+		<!-- **************************** -->
+		<!-- TWAPv2 parameter constraints -->
+		<!-- **************************** -->
+		<val:StrategyEdit errorMessage="targetEndTime or duration must be provided if behaviour is set to SpeedUpAndFill, SpeedUpAndCancel or SpeedUpAndExtend">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="targetEndTime" operator="EX" />
+				<val:Edit logicOperator="OR">
+					<val:Edit field="durationD" operator="EX" />
+					<val:Edit field="durationH" operator="EX" />
+					<val:Edit field="durationM" operator="EX" />
+				</val:Edit>
+				<val:Edit field="behaviour" operator="EQ" value="ConstantSpeedAndExtend" />
+			</val:Edit>
+		</val:StrategyEdit>
+
+		<val:StrategyEdit errorMessage="duration must be greater than 0">
+			<val:Edit logicOperator="OR">
+				<val:Edit logicOperator="AND">
+					<val:Edit field="durationD" operator="NX" />
+					<val:Edit field="durationH" operator="NX" />
+					<val:Edit field="durationM" operator="NX" />
+				</val:Edit>
+				<val:Edit logicOperator="OR">
+					<val:Edit field="durationD" operator="GT" value="0" />
+					<val:Edit field="durationH" operator="GT" value="0" />
+					<val:Edit field="durationM" operator="GT" value="0" />
+				</val:Edit>
+			</val:Edit>
+		</val:StrategyEdit>
+
+		<val:StrategyEdit errorMessage="targetEndTime must be later than the Start Time of the order">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="targetEndTime" operator="NX" />
+				<val:Edit logicOperator="OR">
+					<val:Edit field="startTime" operator="NX" />
+					<val:Edit field="targetEndTime" operator="GT" field2="startTime" />
+				</val:Edit>
+			</val:Edit>
+		</val:StrategyEdit>
+
+		<val:StrategyEdit errorMessage="targetEndTime must be earlier than the End Time of the order">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="targetEndTime" operator="NX" />
+				<val:Edit logicOperator="OR">
+					<val:Edit field="endTime" operator="NX" />
+					<val:Edit field="targetEndTime" operator="LT" field2="endTime" />
+				</val:Edit>
+			</val:Edit>
+		</val:StrategyEdit>
+
+		<val:StrategyEdit errorMessage="timeInterval must be provided if behaviour is set to ConstantSpeed">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="behaviour" operator="NE" value="ConstantSpeedAndExtend" />
+				<val:Edit logicOperator="OR">
+					<val:Edit field="timeIntervalH" operator="EX" />
+					<val:Edit field="timeIntervalM" operator="EX" />
+					<val:Edit field="timeIntervalS" operator="EX" />
+				</val:Edit>
+			</val:Edit>
+		</val:StrategyEdit>
+
+		<val:StrategyEdit errorMessage="atStopLevelBehaviour must be provided if stopLevel is set.">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="stopLevel" operator="NX" />
+				<val:Edit field="atStopLevelBehaviour" operator="EX" />
+			</val:Edit>
+		</val:StrategyEdit>
+
+	</Strategy>
+</Strategies>

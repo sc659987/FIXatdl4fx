@@ -1,0 +1,312 @@
+<!-- Version: $Revision: 1.15 $  -->
+<Strategies
+        xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+        xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation"
+        xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+        xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+        strategyIdentifierTag="9000"
+        >
+    <Strategy name="PEGGEDTWAP" uiRep="Pegged TWAP" wireValue="TWAP" version="1" fixMsgType="D" providerID="GS">
+        <Description>Execute fixed slices of the order at specified time intervals using a Pegged Strategy</Description>
+
+        <!-- BEGIN 360t specific parameters used to save the state of checkboxes. Will not be sent to provider. -->
+		    <Parameter name="_360t_Duration1" xsi:type="Boolean_t" fixTag="100002" mutableOnCxlRpl="false"/>
+     		<Parameter name="_360t_Duration2" xsi:type="Boolean_t" fixTag="100003" mutableOnCxlRpl="false"/>
+     		<Parameter name="_360t_Slice1" xsi:type="Boolean_t" fixTag="100004" mutableOnCxlRpl="false"/>
+     		<Parameter name="_360t_Slice2" xsi:type="Boolean_t" fixTag="100005" mutableOnCxlRpl="false"/>
+     		<Parameter name="_360t_EnableStartTime" xsi:type="Boolean_t" fixTag="100006" mutableOnCxlRpl="true"/>
+        <!-- END 360t specific parameters -->
+
+        <Parameter name="AlgoStartTime" xsi:type="UTCTimestamp_t" fixTag="9001" use="optional" mutableOnCxlRpl="false">
+            <Description>Strategy Start Time</Description>
+        </Parameter>
+
+		    <Parameter name="AlgoDurationH" xsi:type="Int_t" fixTag="90231" use="optional" minValue="0" maxValue="23" mutableOnCxlRpl="false">
+			    <Description>Amount of time the algorithm will remain active - hours</Description>
+		    </Parameter>
+		    <Parameter name="AlgoDurationM" xsi:type="Int_t" fixTag="90232" use="optional" minValue="0" maxValue="59" mutableOnCxlRpl="false">
+			    <Description>Amount of time the algorithm will remain active - minutes</Description>
+		    </Parameter>
+		    <Parameter name="AlgoDurationS" xsi:type="Int_t" fixTag="90233" use="optional" minValue="0" maxValue="59" mutableOnCxlRpl="false">
+			    <Description>Amount of time the algorithm will remain active - seconds</Description>
+        </Parameter>
+
+        <Parameter name="AlgoEndTime" xsi:type="UTCTimestamp_t" fixTag="9004" use="optional" mutableOnCxlRpl="false">
+            <Description>Strategy End Time</Description>
+        </Parameter>
+
+        <Parameter name="SliceSize" xsi:type="Int_t" fixTag="9003" use="optional" mutableOnCxlRpl="false">
+            <Description>Quantity of an individual slice</Description>
+        </Parameter>
+
+		    <Parameter name="SliceIntervalH" xsi:type="Int_t" fixTag="90021" use="optional" mutableOnCxlRpl="false" minValue="0" maxValue="23">
+			    <Description>Fixed time interval between slices - hours</Description>
+		    </Parameter>
+		    <Parameter name="SliceIntervalM" xsi:type="Int_t" fixTag="90022" use="optional" mutableOnCxlRpl="false" minValue="0" maxValue="59">
+			    <Description>Fixed time interval between slices - minutes</Description>
+		    </Parameter>
+		    <Parameter name="SliceIntervalS" xsi:type="Int_t" fixTag="90023" use="optional" mutableOnCxlRpl="false" minValue="0" maxValue="59">
+			    <Description>Fixed time interval between slices - seconds</Description>
+        </Parameter>
+
+        <Parameter name="LiquiditySource" xsi:type="Int_t" fixTag="9029" use="optional" mutableOnCxlRpl="true">
+            <Description></Description>
+            <EnumPair enumID="PrincipalOnly" wireValue="0"/>
+            <EnumPair enumID="Combined" wireValue="1"/>
+        </Parameter>
+
+        <Parameter name="ExecutionStrategy" xsi:type="String_t" fixTag="9030" use="optional" mutableOnCxlRpl="true">
+            <Description></Description>
+            <EnumPair enumID="PEGGED" wireValue="PEGGED"/>
+            <EnumPair enumID="DYNAMIC" wireValue="DYNAMIC"/>
+        </Parameter>
+
+        <Parameter name="ExecutionStyleDynamic" xsi:type="Int_t" fixTag="9008" use="optional" mutableOnCxlRpl="true">
+            <Description></Description>
+            <EnumPair enumID="Hybrid" wireValue="3"/>
+            <EnumPair enumID="Aggressive" wireValue="2"/>
+            <EnumPair enumID="Iceberg" wireValue="4"/>
+        </Parameter>
+
+        <Parameter name="ExecutionStylePegged" xsi:type="Int_t" fixTag="9008" use="optional" mutableOnCxlRpl="true">
+            <Description></Description>
+            <EnumPair enumID="Passive" wireValue="0"/>
+            <EnumPair enumID="Neutral" wireValue="1"/>
+            <EnumPair enumID="Aggressive" wireValue="2"/>
+        </Parameter>
+
+        <Parameter name="DisplayAmount" xsi:type="Int_t" fixTag="9013" use="optional" mutableOnCxlRpl="true">
+            <Description></Description>
+            <EnumPair enumID="A1m" wireValue="1000000"/>
+            <EnumPair enumID="A2m" wireValue="2000000"/>
+            <EnumPair enumID="A3m" wireValue="3000000"/>
+            <EnumPair enumID="A4m" wireValue="4000000"/>
+            <EnumPair enumID="A5m" wireValue="5000000"/>
+        </Parameter>
+
+        <Parameter name="NoWorseThan" xsi:type="Float_t" fixTag="9005" use="optional" mutableOnCxlRpl="true">
+            <Description>Prevents execution if market is worse than specified price</Description>
+        </Parameter>
+
+        <Parameter name="SpreadLimit" xsi:type="Int_t" fixTag="9006" use="optional" mutableOnCxlRpl="true">
+            <Description>Slices will be skipped when the bid-offer spread is outside the specified range (in pips)</Description>
+        </Parameter>
+
+        <Parameter name="WouldIfGood" xsi:type="Float_t" fixTag="9007" use="optional" mutableOnCxlRpl="true">
+            <Description>The remaining quantity of an open order is executed like a limit order if market moves favourably to the specified price</Description>
+        </Parameter>
+
+        <Parameter name="TimeInForce" xsi:type="Char_t" fixTag="59" use="required" mutableOnCxlRpl="true">
+            <EnumPair enumID="Day" wireValue="0"/>
+        </Parameter>
+
+        <lay:StrategyLayout>
+            <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="">
+
+                    <lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" title="Start Time (Default is NOW)">
+                        <lay:StrategyPanel collapsible="false" orientation="VERTICAL">
+                            <lay:Control tooltip="Start at the selected time" ID="EnableStartTime" xsi:type="lay:CheckBox_t" label="At:" parameterRef="_360t_EnableStartTime"/>
+                        </lay:StrategyPanel>
+                        <lay:StrategyPanel collapsible="false" orientation="VERTICAL">
+                            <lay:Control ID="StartTimeClock" xsi:type="lay:Clock_t" label="" parameterRef="AlgoStartTime">
+                                <flow:StateRule enabled="false" value="{NULL}">
+                                    <val:Edit field="EnableStartTime" operator="EQ" value="false"/>
+                                </flow:StateRule>
+                            </lay:Control>
+                        </lay:StrategyPanel>
+                    </lay:StrategyPanel>
+
+                    <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="End Time">
+                        <lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+                            <lay:Control tooltip="Duration" ID="EnableDuration" xsi:type="lay:RadioButton_t" label="Duration" initValue="true" parameterRef="_360t_Duration1" radioGroup="EndTimeRB"/>
+						                <lay:Control ID="Duration_H" xsi:type="lay:SingleSpinner_t" label="" parameterRef="AlgoDurationH" initValue="1">
+							                <flow:StateRule enabled="false" value="{NULL}">
+								                <val:Edit field="EnableDuration" operator="EQ" value="false" />
+							                </flow:StateRule>
+						                </lay:Control>
+						                <lay:Control ID="Duration_M_L" xsi:type="lay:Label_t" initValue=":"/>
+						                <lay:Control ID="Duration_M" xsi:type="lay:SingleSpinner_t" label="" parameterRef="AlgoDurationM" initValue="0">
+							                <flow:StateRule enabled="false" value="{NULL}">
+								                <val:Edit field="EnableDuration" operator="EQ" value="false" />
+							                </flow:StateRule>
+						                </lay:Control>
+						                <lay:Control ID="Duration_S_L" xsi:type="lay:Label_t" initValue=":"/>
+						                <lay:Control ID="Duration_S" xsi:type="lay:SingleSpinner_t" label="" parameterRef="AlgoDurationS" initValue="0">
+                                <flow:StateRule enabled="false" value="{NULL}">
+                                    <val:Edit field="EnableDuration" operator="EQ" value="false"/>
+                                </flow:StateRule>
+                            </lay:Control>
+                        </lay:StrategyPanel>
+                        <lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+                          <lay:StrategyPanel collapsible="false" orientation="VERTICAL">
+                              <lay:Control tooltip="End at the selected time" ID="EnableEndTime" xsi:type="lay:RadioButton_t" label="At:" parameterRef="_360t_Duration2" radioGroup="EndTimeRB"/>
+                          </lay:StrategyPanel>
+                          <lay:StrategyPanel collapsible="false" orientation="VERTICAL">
+                            <lay:Control ID="EndTimeClock" xsi:type="lay:Clock_t" label="" parameterRef="AlgoEndTime">
+                                <flow:StateRule enabled="false" value="{NULL}">
+                                    <val:Edit field="EnableEndTime" operator="EQ" value="false"/>
+                                </flow:StateRule>
+                            </lay:Control>
+                        </lay:StrategyPanel>
+                    </lay:StrategyPanel>
+                </lay:StrategyPanel>
+
+                <lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+                    <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="Slice Parameters">
+                        <lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+                            <lay:Control tooltip="Quantity of an individual slice" ID="EnableSliceSize" xsi:type="lay:RadioButton_t" label="Slice Size" initValue="true"  parameterRef="_360t_Slice1" radioGroup="SliceRB"/>
+                            <lay:Control ID="SliceSize" xsi:type="lay:TextField_t" label="" parameterRef="SliceSize">
+                                <flow:StateRule enabled="false" value="{NULL}">
+                                    <val:Edit field="EnableSliceSize" operator="NE" value="true"/>
+                                </flow:StateRule>
+                            </lay:Control>
+                        </lay:StrategyPanel>
+                        <lay:StrategyPanel collapsible="false" orientation="HORIZONTAL">
+                            <lay:Control tooltip="Fixed time interval between slices" ID="EnableSliceInterval" xsi:type="lay:RadioButton_t" label="Slice Interval" parameterRef="_360t_Slice2" radioGroup="SliceRB"/>
+					                  <lay:Control ID="SliceInterval" xsi:type="lay:SingleSpinner_t" label="" parameterRef="SliceIntervalH" initValue="0">
+						                  <flow:StateRule enabled="false" value="{NULL}">
+							                  <val:Edit field="EnableSliceInterval" operator="NE" value="true" />
+						                  </flow:StateRule>
+					                  </lay:Control>
+					                  <lay:Control ID="SliceInterval_M_L" xsi:type="lay:Label_t" initValue=":"/>
+                            <lay:Control ID="SliceInterval_M" xsi:type="lay:SingleSpinner_t" label="" parameterRef="SliceIntervalM" initValue="10">
+						                  <flow:StateRule enabled="false" value="{NULL}">
+							                  <val:Edit field="EnableSliceInterval" operator="NE" value="true" />
+						                  </flow:StateRule>
+					                  </lay:Control>
+					                  <lay:Control ID="SliceInterval_S_L" xsi:type="lay:Label_t" initValue=":"/>
+                            <lay:Control ID="SliceInterval_S" xsi:type="lay:SingleSpinner_t" label="" parameterRef="SliceIntervalS" initValue="0">
+                                <flow:StateRule enabled="false" value="{NULL}">
+                                    <val:Edit field="EnableSliceInterval" operator="NE" value="true"/>
+                                </flow:StateRule>
+                            </lay:Control>
+                        </lay:StrategyPanel>
+                    </lay:StrategyPanel>
+
+                    <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="Good Until">
+                        <lay:Control tooltip="" ID="GoodUntil" xsi:type="lay:RadioButtonList_t" parameterRef="TimeInForce" initValue="Day" orientation="VERTICAL">
+                            <lay:ListItem uiRep="Day" enumID="Day"/>
+                        </lay:Control>
+	  	                  <lay:Control ID="GoodUntil_L" xsi:type="lay:Label_t" initValue="                   "/>
+                    </lay:StrategyPanel>
+                </lay:StrategyPanel>
+
+                <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="Liquidity Source">
+                    <lay:Control ID="PrincipalOnly" xsi:type="lay:CheckBox_t" label="Principal Only?" tooltip="Principal Only?" parameterRef="LiquiditySource" initValue="false" checkedEnumRef="PrincipalOnly" uncheckedEnumRef="Combined">
+                    </lay:Control>
+
+                    <lay:Control tooltip="" ID="ExecStrategy" xsi:type="lay:DropDownList_t" label="Execution Strategy" initValue="PEGGED" parameterRef="ExecutionStrategy">
+                        <flow:StateRule enabled="false" value="{NULL}">
+                            <val:Edit field="PrincipalOnly" operator="EQ" value="true"/>
+                        </flow:StateRule>
+                        <lay:ListItem enumID="PEGGED" uiRep="Pegged"/>
+                        <lay:ListItem enumID="DYNAMIC" uiRep="Dynamic"/>
+                    </lay:Control>
+
+                    <lay:Control ID="PeggedStyles" xsi:type="lay:Slider_t" label="Pegged" parameterRef="ExecutionStylePegged" initValue="Passive">
+                        <flow:StateRule enabled="false" value="{NULL}">
+                            <val:Edit logicOperator="OR">
+                                <val:Edit field="ExecStrategy" operator="NE" value="PEGGED"/>
+                                <val:Edit field="PrincipalOnly" operator="EQ" value="true"/>
+                            </val:Edit>
+                        </flow:StateRule>
+
+                        <flow:StateRule enabled="true">
+                            <val:Edit logicOperator="AND">
+                                <val:Edit field="ExecStrategy" operator="EQ" value="PEGGED"/>
+                                <val:Edit field="PrincipalOnly" operator="EQ" value="false"/>
+                            </val:Edit>
+                        </flow:StateRule>
+
+                        <lay:ListItem enumID="Passive" uiRep="Passive"/>
+                        <lay:ListItem enumID="Neutral" uiRep="Neutral"/>
+                        <lay:ListItem enumID="Aggressive" uiRep="Aggressive"/>
+
+                    </lay:Control>
+
+                    <lay:Control ID="DynamicStyles" xsi:type="lay:Slider_t" label="Dynamic" parameterRef="ExecutionStyleDynamic" initValue="Hybrid">
+                        <flow:StateRule enabled="true">
+                            <val:Edit logicOperator="AND">
+                                <val:Edit field="ExecStrategy" operator="EQ" value="DYNAMIC"/>
+                                <val:Edit field="PrincipalOnly" operator="EQ" value="false"/>
+                            </val:Edit>
+                        </flow:StateRule>
+
+                        <flow:StateRule enabled="false" value="{NULL}">
+                            <val:Edit logicOperator="OR">
+                                <val:Edit field="ExecStrategy" operator="NE" value="DYNAMIC"/>
+                                <val:Edit field="PrincipalOnly" operator="EQ" value="true"/>
+                            </val:Edit>
+                        </flow:StateRule>
+
+                        <lay:ListItem enumID="Hybrid" uiRep="Hybrid"/>
+                        <lay:ListItem enumID="Aggressive" uiRep="Aggressive"/>
+                        <lay:ListItem enumID="Iceberg" uiRep="Iceberg"/>
+                    </lay:Control>
+
+                    <lay:Control xsi:type="lay:DropDownList_t" ID="DisplayAmount" label="Display Amount" parameterRef="DisplayAmount">
+                        <flow:StateRule enabled="false" value="{NULL}">
+                            <val:Edit logicOperator="OR">
+                                <val:Edit field="PrincipalOnly" operator="EQ" value="true"/>
+                                <val:Edit field="DynamicStyles" operator="NE" value="Iceberg"/>
+                                <val:Edit field="ExecStrategy" operator="EQ" value="PEGGED"/>
+                            </val:Edit>
+                        </flow:StateRule>
+
+                        <flow:StateRule enabled="true">
+                            <val:Edit logicOperator="AND">
+                                <val:Edit field="PrincipalOnly" operator="EQ" value="false"/>
+                                <val:Edit field="DynamicStyles" operator="EQ" value="Iceberg"/>
+                                <val:Edit field="ExecStrategy" operator="EQ" value="DYNAMIC"/>
+                            </val:Edit>
+                        </flow:StateRule>
+
+                        <lay:ListItem enumID="A1m" uiRep="1,000,000"/>
+                        <lay:ListItem enumID="A2m" uiRep="2,000,000"/>
+                        <lay:ListItem enumID="A3m" uiRep="3,000,000"/>
+                        <lay:ListItem enumID="A4m" uiRep="4,000,000"/>
+                        <lay:ListItem enumID="A5m" uiRep="5,000,000"/>
+                    </lay:Control>
+
+                </lay:StrategyPanel>
+
+                <lay:StrategyPanel collapsible="false" collapsed="true" orientation="VERTICAL" title="Advanced">
+
+                    <lay:Control xsi:type="lay:TextField_t" ID="NoWorseThan" parameterRef="NoWorseThan" label="No Worse Than Level">
+                    </lay:Control>
+
+                    <lay:Control xsi:type="lay:TextField_t" ID="WouldIfGood" parameterRef="WouldIfGood" label="Would If Good Level">
+                    </lay:Control>
+
+                    <lay:Control xsi:type="lay:TextField_t" ID="SpreadLimit" parameterRef="SpreadLimit" label="Spread Limit (Pips)">
+                    </lay:Control>
+
+                </lay:StrategyPanel>
+            </lay:StrategyPanel>
+        </lay:StrategyLayout>
+
+        <!-- No Worse than is required when Dynamic -->
+        <val:StrategyEdit errorMessage="'No Worse Than' is required when 'Execution Strategy' is 'Dynamic'">
+            <val:Edit logicOperator="OR">
+                <val:Edit field="ExecutionStrategy" operator="NE" value="DYNAMIC"/>
+                <val:Edit logicOperator="AND">
+                    <val:Edit field="ExecutionStrategy" operator="EQ" value="DYNAMIC"/>
+                    <val:Edit field="NoWorseThan" operator="EX"/>
+                </val:Edit>
+            </val:Edit>
+        </val:StrategyEdit>
+
+        <!-- 'SliceSize' value is required when 'SliceSize' is selected -->
+        <val:StrategyEdit errorMessage="'SliceSize' value is required when this option is selected">
+            <val:Edit logicOperator="OR">
+                <val:Edit field="_360t_Slice1" operator="NE" value="true"/>
+                <val:Edit logicOperator="AND">
+                    <val:Edit field="_360t_Slice1" operator="EQ" value="true"/>
+                    <val:Edit field="SliceSize" operator="EX"/>
+                </val:Edit>
+            </val:Edit>
+        </val:StrategyEdit>
+    </Strategy>
+</Strategies>

@@ -1,0 +1,156 @@
+<Strategies xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation"
+            xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+            xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            imageLocation="/images/banner.gif"
+            strategyIdentifierTag="847"
+            versionIdentifierTag="9682">
+
+    <Strategy name="TWAP" uiRep="TWAP" wireValue="1005" providerID="BAML" version="BAML v9.7.6.3">
+        <Description>&lt;html&gt;&lt;div style=&quot;width:350px;&quot;&gt;Executes an order evenly over a user defined
+            period. You can add our internal liquidity stream if you do not want to cross spreads in the market.
+        </Description>
+
+        <Parameter name="LimitPrice" xsi:type="Price_t" fixTag="44" use="optional"/>
+
+        <Parameter name="IncludeExchanges" use="required" fixTag="9005" xsi:type="String_t">
+            <EnumPair wireValue="SMART" enumID="SMART"/>
+            <EnumPair wireValue="PRIMARY" enumID="PRIMARY"/>
+            <EnumPair wireValue="A" enumID="A"/>
+            <EnumPair wireValue="B" enumID="B"/>
+            <EnumPair wireValue="C" enumID="C"/>
+            <EnumPair wireValue="D" enumID="D"/>
+            <EnumPair wireValue="E" enumID="E"/>
+            <EnumPair wireValue="G" enumID="G"/>
+            <EnumPair wireValue="H" enumID="H"/>
+        </Parameter>
+
+        <Parameter name="TimeInForce" xsi:type="Char_t" fixTag="59" use="required">
+            <EnumPair enumID="Day" wireValue="0"/>
+            <EnumPair enumID="GTD" wireValue="6"/>
+        </Parameter>
+
+        <Parameter name="ExpireTime" xsi:type="UTCTimestamp_t" fixTag="126" use="optional">
+            <Description>End order at selected time</Description>
+        </Parameter>
+
+        <Parameter name="_StartType" xsi:type="Char_t" fixTag="10002" use="optional">
+            <EnumPair enumID="Now" wireValue="0"/>
+            <EnumPair enumID="Date" wireValue="1"/>
+        </Parameter>
+        <Parameter name="EffectiveTime" xsi:type="UTCTimestamp_t" fixTag="168" use="optional">
+            <Description>Time of day the order commences execution</Description>
+        </Parameter>
+
+        <Parameter name="Aggressiveness" xsi:type="Int_t" fixTag="9001" use="optional">
+            <EnumPair wireValue="0" enumID="Normal"/>
+            <EnumPair wireValue="50" enumID="High"/>
+        </Parameter>
+        <Parameter name="AllowRandom" xsi:type="Boolean_t" fixTag="9003" use="required" mutableOnCxlRpl="false"/>
+        <Parameter name="AttemptPassive" xsi:type="Boolean_t" fixTag="9004" use="required" mutableOnCxlRpl="false"/>
+
+        <Parameter name="InternalLiquidity" xsi:type="Boolean_t" fixTag="9016" use="required" mutableOnCxlRpl="false"/>
+
+        <lay:StrategyLayout>
+            <lay:StrategyPanel collapsible="false" orientation="VERTICAL">
+
+                <lay:StrategyPanel title="Strategy Parameters" collapsible="false" orientation="VERTICAL">
+
+                    <lay:StrategyPanel collapsible="false" orientation="VERTICAL">
+                        <lay:Control xsi:type="lay:DropDownList_t" initValue="SMART"
+                                     tooltip="&lt;html&gt;&lt;div style=&quot;width:250px;&quot;&gt;Allows you to select where the order routes to. Choosing “Intelligent” allows the algorithm to route for optimal performance"
+                                     parameterRef="IncludeExchanges" label="Liquidity" ID="c_IncludeExchanges">
+                            <lay:ListItem enumID="SMART" uiRep="Intelligent"/>
+                            <lay:ListItem enumID="PRIMARY" uiRep="Primary"/>
+                            <lay:ListItem enumID="E" uiRep="EBS"/>
+                            <lay:ListItem enumID="D" uiRep="D3K (Reuters)"/>
+                            <lay:ListItem enumID="H" uiRep="Hotspot"/>
+                            <lay:ListItem enumID="C" uiRep="Currenex"/>
+                            <lay:ListItem enumID="A" uiRep="FXAll"/>
+                            <lay:ListItem enumID="G" uiRep="GFX"/>
+                            <lay:ListItem enumID="B" uiRep="Curex"/>
+                        </lay:Control>
+
+                        <lay:Control ID="c_LimitPrice" xsi:type="lay:TextField_t"
+                                     tooltip="Will trade up to but not beyond your limit price"
+                                     label="Limit Price" parameterRef="LimitPrice"/>
+
+                        <lay:Control ID="c_Aggressiveness" xsi:type="lay:RadioButtonList_t" label="Urgency"
+                                     parameterRef="Aggressiveness" initValue="Normal" orientation="HORIZONTAL">
+                            <lay:ListItem uiRep="Normal" enumID="Normal"/>
+                            <lay:ListItem uiRep="High" enumID="High"/>
+                        </lay:Control>
+
+
+                        <lay:Control ID="c_InternalLiquidity" xsi:type="lay:CheckBox_t" label="Include Bank Liquidity"
+                                     initValue="true" parameterRef="InternalLiquidity" orientation="HORIZONTAL"
+                                     tooltip="&lt;html&gt;&lt;div style=&quot;width:250px;&quot;&gt;Allows the order to interact with our internal crossing network to further minimize market impact"/>
+
+                        <lay:Control ID="c_AttemptPassive" xsi:type="lay:CheckBox_t" label="Attempt Passive"
+                                     initValue="true" parameterRef="AttemptPassive" orientation="HORIZONTAL"
+                                     tooltip="Allows the slice to be placed on the near side of the market"/>
+                        <lay:Control ID="c_AllowRandom" xsi:type="lay:CheckBox_t" label="Allow Random" initValue="true"
+                                     parameterRef="AllowRandom" orientation="HORIZONTAL"
+                                     tooltip="Randomizes the time for moving from passive to mid to aggressive"/>
+                    </lay:StrategyPanel>
+                </lay:StrategyPanel>
+
+
+                <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="Start">
+                    <lay:Control ID="c_StartDateNote" xsi:type="lay:Label_t"
+                                 initValue="&lt;html&gt;&lt;i&gt;Time of day that the order commences execution"/>
+
+                    <lay:Control ID="c_StartType" xsi:type="lay:RadioButtonList_t" parameterRef="_StartType"
+                                 initValue="Now" orientation="VERTICAL">
+                        <lay:ListItem uiRep="Now" enumID="Now"/>
+                        <lay:ListItem uiRep="Date" enumID="Date"/>
+                    </lay:Control>
+
+                    <lay:Control ID="c_EffectiveTime" xsi:type="lay:Clock_t" label="" parameterRef="EffectiveTime">
+                        <flow:StateRule enabled="false" value="{NULL}">
+                            <val:Edit field="c_StartType" operator="NE" value="Date"/>
+                        </flow:StateRule>
+                    </lay:Control>
+                </lay:StrategyPanel>
+
+
+                <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="End">
+                    <lay:Control ID="c_EndDateNote" xsi:type="lay:Label_t"
+                                 initValue="&lt;html&gt;&lt;i&gt;Time of day that the order expires"/>
+
+                    <lay:Control ID="c_TimeInForce" xsi:type="lay:RadioButtonList_t" parameterRef="TimeInForce"
+                                 initValue="Day" orientation="VERTICAL">
+                        <lay:ListItem uiRep="Day" enumID="Day"/>
+                        <lay:ListItem uiRep="Good Until" enumID="GTD"/>
+                    </lay:Control>
+
+                    <lay:Control ID="c_ExpireTime" xsi:type="lay:Clock_t" label="" parameterRef="ExpireTime">
+                        <flow:StateRule enabled="false" value="{NULL}">
+                            <val:Edit field="c_TimeInForce" operator="NE" value="GTD"/>
+                        </flow:StateRule>
+                    </lay:Control>
+
+                    <lay:Control ID="c_MultidayNotSupported" xsi:type="lay:Label_t"
+                                 initValue="* Multi-day orders are not supported.">
+                        <flow:StateRule visible="false">
+                            <val:Edit field="c_TimeInForce" operator="EQ" value="Day"/>
+                        </flow:StateRule>
+                    </lay:Control>
+                </lay:StrategyPanel>
+            </lay:StrategyPanel>
+
+        </lay:StrategyLayout>
+
+        <val:StrategyEdit errorMessage="Start time must be less than end time.">
+            <val:Edit logicOperator="OR">
+                <val:Edit field="ExpireTime" operator="NX"/>
+                <val:Edit field="EffectiveTime" operator="NX"/>
+                <val:Edit field="ExpireTime" operator="GT" field2="EffectiveTime"/>
+            </val:Edit>
+        </val:StrategyEdit>
+    </Strategy>
+</Strategies>
+
+

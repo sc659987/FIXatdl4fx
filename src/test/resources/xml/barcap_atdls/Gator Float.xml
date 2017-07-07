@@ -1,0 +1,116 @@
+<!-- ********************* -->
+<!-- ***** Gator Float **** -->
+<!-- ********************* -->
+
+<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core" xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation" xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout" xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core" strategyIdentifierTag="847" versionIdentifierTag="958">
+
+	<Strategy name="GatorFloat" uiRep="Gator Float" wireValue="2004" providerID="">
+
+		<!-- Common parameters -->
+		<Parameter name="startTime" xsi:type="UTCTimestamp_t" use="optional" />
+		<Parameter name="endTime" xsi:type="UTCTimestamp_t" use="optional" />
+
+		<!-- GatorFloat parameters -->
+		<Parameter name="targetExecutionRate" xsi:type="Float_t" use="required">
+			<EnumPair enumID="e_Slow" wireValue="0.00" />
+			<EnumPair enumID="e_Medium" wireValue="0.25" />
+			<EnumPair enumID="e_MediumFast" wireValue="0.50" />
+			<EnumPair enumID="e_Fast" wireValue="0.75" />
+			<EnumPair enumID="e_VeryFast" wireValue="1.00" />
+		</Parameter>
+		<Parameter name="passiveOnPrimaryMarketOnly" xsi:type="Boolean_t" use="optional">
+			<EnumPair enumID="false" wireValue="N" />
+			<EnumPair enumID="true" wireValue="Y" />
+		</Parameter>
+		<Parameter name="level" xsi:type="Price_t" use="optional" />
+
+		<lay:StrategyLayout>
+
+			<lay:StrategyPanel title="Strategy Parameters" collapsible="false" orientation="VERTICAL">
+
+				<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+					<lay:StrategyPanel title="Description" collapsible="false" orientation="VERTICAL">
+						<lay:Control ID="DescriptionL1" xsi:type="lay:Label_t" label="A participation order that seeks to capture spread tracking market price action.       " />
+					</lay:StrategyPanel>
+				</lay:StrategyPanel>
+
+				<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+					<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+						<lay:StrategyPanel title="Common Parameters" collapsible="false" orientation="VERTICAL">
+							<!-- Start time -->
+							<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" title="Start Time">
+								<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+									<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+										<lay:Control ID="c_NoStartTime" xsi:type="lay:RadioButton_t" label="Now" initValue="true" radioGroup="StartTimeRB" />
+									</lay:StrategyPanel>
+								</lay:StrategyPanel>
+								<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+									<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+										<lay:Control ID="c_EnableStartTime" xsi:type="lay:RadioButton_t" radioGroup="StartTimeRB" />
+									</lay:StrategyPanel>
+									<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+										<lay:Control ID="c_StartTime" xsi:type="lay:Clock_t" parameterRef="startTime">
+											<flow:StateRule enabled="false" value="{NULL}">
+												<val:Edit field="c_EnableStartTime" operator="EQ" value="false" />
+											</flow:StateRule>
+										</lay:Control>
+									</lay:StrategyPanel>
+								</lay:StrategyPanel>
+							</lay:StrategyPanel>
+
+							<!-- End time -->
+							<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" title="End Time">
+								<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+									<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+										<lay:Control ID="c_EndTime" xsi:type="lay:Clock_t" parameterRef="endTime" label="                  " initValueMode="1" initValue="16:59:00" localMktTz="America/New_York"/>
+									</lay:StrategyPanel>
+								</lay:StrategyPanel>
+							</lay:StrategyPanel>
+						</lay:StrategyPanel>
+
+						<lay:StrategyPanel title="Gator Float Parameters" collapsible="false" orientation="VERTICAL">
+							<lay:StrategyPanel collapsible="false" orientation="VERTICAL" border="None">
+								<lay:Control ID="c_TargetExecutionRate" xsi:type="lay:DropDownList_t" initValue="e_MediumFast" label="Target Execution Rate" parameterRef="targetExecutionRate">
+									<lay:ListItem enumID="e_Slow" uiRep="Slow" />
+									<lay:ListItem enumID="e_Medium" uiRep="Medium" />
+									<lay:ListItem enumID="e_MediumFast" uiRep="Medium Fast" />
+									<lay:ListItem enumID="e_Fast" uiRep="Fast" />
+									<lay:ListItem enumID="e_VeryFast" uiRep="Very Fast" />
+								</lay:Control>
+								<lay:Control ID="c_PassiveOnPrimaryMarketOnly" xsi:type="lay:CheckBox_t" initValue="false" label="Passive On Primary Market Only" parameterRef="passiveOnPrimaryMarketOnly"
+									tooltip="&lt;html&gt;If this is set to Yes, orders will only be placed on&lt;br/&gt;the primary market for that currency pair. This means&lt;br/&gt;that passive orders will not be placed on any other&lt;br/&gt;markets (although aggressive fills can still be obtained&lt;br/&gt;from other markets)&lt;/html&gt;" />
+							</lay:StrategyPanel>
+							<lay:StrategyPanel collapsible="false" orientation="HORIZONTAL" border="None">
+								<lay:Control ID="c_EnableLevel" xsi:type="lay:CheckBox_t" label="Price Level" initValue="false" />
+								<lay:Control ID="c_Level" xsi:type="lay:TextField_t" parameterRef="level"
+									tooltip="&lt;html&gt;This level controls when orders are placed in the market.&lt;br/&gt;TWAP will only place orders in the market when the price is&lt;br/&gt;below this level if buying or above this level if selling.&lt;br/&gt;For example, use the &#x2018;Sell Above&#x2019; to put in a Limit Price,&lt;br/&gt;which will pause the sell order every time it goes below&lt;br/&gt;your specified limit price.&lt;/html&gt;">
+									<flow:StateRule enabled="false" value="{NULL}">
+										<val:Edit field="c_EnableLevel" operator="EQ" value="false" />
+									</flow:StateRule>
+								</lay:Control>
+							</lay:StrategyPanel>
+						</lay:StrategyPanel>
+					</lay:StrategyPanel>
+				</lay:StrategyPanel>
+			</lay:StrategyPanel>
+		</lay:StrategyLayout>
+
+		<!-- **************************** -->
+		<!-- Common parameter constraints -->
+		<!-- **************************** -->
+		<val:StrategyEdit errorMessage="Start Time must precede End Time.">
+			<val:Edit logicOperator="OR">
+				<val:Edit field="startTime" operator="NX" />
+				<val:Edit field="endTime" operator="NX" />
+				<val:Edit field="startTime" operator="LT" field2="endTime" />
+			</val:Edit>
+		</val:StrategyEdit>
+
+		<!-- ********************************* -->
+		<!-- Gator Float parameter constraints -->
+		<!-- ********************************* -->
+
+	</Strategy>
+</Strategies>
+

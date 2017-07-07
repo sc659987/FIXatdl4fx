@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core" 
+	xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow" 
+	xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout" 
+	xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core fixatdl-core-1-1.xsd" 
+	strategyIdentifierTag="7620" 
+	versionIdentifierTag="7621">
+
+    <Strategy name="MinMaxLengthSample" uiRep="Min/Max Length Sample" wireValue="1" providerID="ABC">
+    	<Parameter name="AlphaMode" xsi:type="Int_t" fixTag="8300" use="required">
+			<EnumPair enumID="e_Annual" wireValue="1"/>
+			<EnumPair enumID="e_Daily" wireValue="2"/>
+			<EnumPair enumID="e_Custom" wireValue="3"/>
+		</Parameter>
+		<Parameter name="CustomValue" xsi:type="Float_t" fixTag="8301" use="optional"/>
+		<lay:StrategyLayout>
+			<lay:StrategyPanel orientation="HORIZONTAL">
+				<lay:Control ID="c_AlphaMode" xsi:type="lay:DropDownList_t" label="Alpha Benchmark" parameterRef="AlphaMode">
+					<lay:ListItem enumID="e_Annual" uiRep="Annual"/>
+					<lay:ListItem enumID="e_Daily" uiRep="Daily"/>
+					<lay:ListItem enumID="e_Custom" uiRep="Custom"/>
+				</lay:Control>
+				<lay:Control ID="c_CustomValue" xsi:type="lay:SingleSpinner_t" label="Custom Alpha" parameterRef="CustomValue">
+					<flow:StateRule enabled="true">
+						<val:Edit field="c_AlphaMode" operator="EQ" value="e_Custom"/>
+					</flow:StateRule>
+				</lay:Control>
+			</lay:StrategyPanel>
+		</lay:StrategyLayout>
+	</Strategy>
+</Strategies>

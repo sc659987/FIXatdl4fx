@@ -1,0 +1,56 @@
+<Strategies xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core" xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core" xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation" xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout" xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" imageLocation="/images/banner.gif" strategyIdentifierTag="847" versionIdentifierTag="9682" >
+  <Strategy name="CriticalMass" uiRep="Critical Mass" wireValue="1004" providerID="BAML" version="BAML v9.7.6.3">
+    <Description>&lt;html&gt;&lt;div style=&quot;width:350px;&quot;&gt;Aggressive strategy that takes liquidity simultaneously from all pools. Ability to trade the underlying legs for crosses when the synthetic price is more favourable than the direct market. Option to deploy an iceberg to work the balance when there is residual left in the order.         </Description>
+    <Parameter name="LimitPrice" xsi:type="Price_t" fixTag="44" use="required" />
+    <Parameter name="IncludeExchanges" use="required" fixTag="9005" xsi:type="String_t">
+      <EnumPair wireValue="SMART" enumID="SMART" />
+      <EnumPair wireValue="PRIMARY" enumID="PRIMARY" />
+      <EnumPair wireValue="A" enumID="A" />
+      <EnumPair wireValue="D" enumID="D" />
+      <EnumPair wireValue="E" enumID="E" />
+      <EnumPair wireValue="H" enumID="H" />
+    </Parameter>
+    <Parameter name="ExposedPercent" xsi:type="Int_t" fixTag="9018" minValue="0" maxValue="100" use="required" mutableOnCxlRpl="false" />
+    <Parameter name="TimeInForce" xsi:type="Char_t" fixTag="59" use="required">
+      <EnumPair enumID="Day" wireValue="0" />
+      <EnumPair enumID="GTD" wireValue="6" />
+    </Parameter>
+    <Parameter name="ExpireTime" xsi:type="UTCTimestamp_t" fixTag="126" use="optional">
+      <Description>End order at selected time</Description>
+    </Parameter>
+    <Parameter name="WorkBalance" xsi:type="Boolean_t" fixTag="9000" use="required" mutableOnCxlRpl="false" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel collapsible="false" orientation="VERTICAL">
+        <lay:StrategyPanel title="Strategy Parameters" collapsible="false" orientation="VERTICAL">
+          <lay:Control ID="c_WorkBalance" xsi:type="lay:CheckBox_t" label="Work The Balance" initValue="true" parameterRef="WorkBalance" orientation="HORIZONTAL" tooltip="Deploys an Iceberg order for the remaining balance" />
+          <lay:Control ID="c_ExposedPercent" xsi:type="lay:SingleSpinner_t" increment="1" tooltip="&lt;html&gt;&lt;div style=&quot;width:250px;&quot;&gt;Percentage of the original order amount exposed when “Working the Balance”" parameterRef="ExposedPercent" orientation="HORIZONTAL" label="Exposed Percent" initValue="10" />
+          <lay:Control ID="c_LimitPrice" xsi:type="lay:TextField_t" tooltip="Will trade up to, but not beyond, your limit price" label="Limit Price" parameterRef="LimitPrice" />
+          <lay:Control xsi:type="lay:DropDownList_t" initValue="SMART" tooltip="&lt;html&gt;&lt;div style=&quot;width:250px;&quot;&gt;Allows you to select the trading venue where the order routes. Choosing “Intelligent” allows the algorithm to route to the trading venues with the highest probability of execution at the best price" parameterRef="IncludeExchanges" label="Liquidity" ID="c_IncludeExchanges">
+            <lay:ListItem enumID="SMART" uiRep="Intelligent" />
+            <lay:ListItem enumID="PRIMARY" uiRep="Primary" />
+            <lay:ListItem enumID="E" uiRep="EBS" />
+            <lay:ListItem enumID="D" uiRep="D3K (Reuters)" />
+            <lay:ListItem enumID="H" uiRep="Hotspot" />
+            <lay:ListItem enumID="A" uiRep="FXAll" />
+          </lay:Control>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel collapsible="false" orientation="VERTICAL" title="Good Until">
+          <lay:Control ID="c_TimeInForce" xsi:type="lay:RadioButtonList_t" parameterRef="TimeInForce" initValue="Day" orientation="VERTICAL">
+            <lay:ListItem uiRep="Day" enumID="Day" />
+            <lay:ListItem uiRep="Good Until" enumID="GTD" />
+          </lay:Control>
+          <lay:Control ID="c_ExpireTime" xsi:type="lay:Clock_t" label="" parameterRef="ExpireTime">
+            <flow:StateRule enabled="false" value="{NULL}">
+              <val:Edit field="c_TimeInForce" operator="NE" value="GTD" />
+            </flow:StateRule>
+          </lay:Control>
+          <lay:Control ID="c_MultidayNotSupported" xsi:type="lay:Label_t" initValue="* Multi-day orders are not supported.">
+            <flow:StateRule visible="false">
+              <val:Edit field="c_TimeInForce" operator="EQ" value="Day" />
+            </flow:StateRule>
+          </lay:Control>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+  </Strategy>
+</Strategies> 
